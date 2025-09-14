@@ -16,13 +16,14 @@ public class InteractionListener implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        plugin.getRegionManager().getRegions().values().forEach(region -> {
-            if (region.contains(event.getClickedBlock().getLocation())) {
-                if (region.getBlacklist().contains(event.getClickedBlock().getType().name())) {
-                    event.setCancelled(true);
+        if (event.getAction() == Action.PHYSICAL) {
+            for (Region region : plugin.getRegionManager().getRegions().values()) {
+                if (region.contains(event.getPlayer().getLocation())) {
+                    if (region.getBlacklist().contains(event.getClickedBlock().getType().name())) {
+                        event.getPlayer().sendMessage("§cYou interacted with a blacklisted block!");
+                    }
                 }
             }
-        });
+        }
     }
 }
