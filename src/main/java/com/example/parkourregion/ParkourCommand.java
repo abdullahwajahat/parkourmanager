@@ -1,13 +1,16 @@
 // File: src/main/java/com/example/parkourregion/ParkourCommand.java
 package com.example.parkourregion;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-public class ParkourCommand implements CommandExecutor {
+import java.util.ArrayList;
+import java.util.List;
+
+public class ParkourCommand implements CommandExecutor, TabCompleter {
 
     private final ParkourRegionPlugin plugin;
 
@@ -17,30 +20,38 @@ public class ParkourCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player player)) return true;
-
-        if (args.length < 2) {
-            player.sendMessage(ChatColor.RED + "Usage: /por <region> <setstart|setend>");
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage("Only players can use this command.");
             return true;
         }
 
-        String regionName = args[0];
-        String action = args[1];
-
-        if (action.equalsIgnoreCase("setstart")) {
-            Region r = plugin.getRegionManager().getRegions().get(regionName);
-            if (r == null) r = new Region(player.getLocation(), player.getLocation(), plugin.getConfig().getStringList("blacklist-default"));
-            plugin.getRegionManager().addRegion(regionName, new Region(player.getLocation(), r.getEnd(), r.getBlacklist()));
-            player.sendMessage(ChatColor.GREEN + "Set start for region " + regionName);
-        } else if (action.equalsIgnoreCase("setend")) {
-            Region r = plugin.getRegionManager().getRegions().get(regionName);
-            if (r == null) r = new Region(player.getLocation(), player.getLocation(), plugin.getConfig().getStringList("blacklist-default"));
-            plugin.getRegionManager().addRegion(regionName, new Region(r.getStart(), player.getLocation(), r.getBlacklist()));
-            player.sendMessage(ChatColor.GREEN + "Set end for region " + regionName);
-        } else {
-            player.sendMessage(ChatColor.RED + "Unknown action! Use setstart or setend");
+        if (args.length == 2 && args[0].equalsIgnoreCase("setstart")) {
+            String regionName = args[1];
+            Region region = plugin.getRegionManager().getRegion(regionName);
+            if (region != null) {
+                region.setStart(player.getLocation());
+                player.sendMessage("§aStart location for region '" + regionName + "' set!");
+            } else {
+                player.sendMessage("§cRegion not found!");
+            }
+            return true;
         }
 
+        sender.sendMessage("§cUsage: /por setstart <region>");
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        List<String> completions = new ArrayList<>();
+        if (args.length == 1) {
+            if ("setstart".startsWith(args[0].toLowerCase())) completions.add("setstart");
+        } else if (args.length == 2) {
+            for (String regionName : plugin.getRegionManager().getRegions().keySet()) {
+                if (regionName.toLowerCase().startsWith(args[1].toLowerCase()))
+                    completions.add(regionName);
+            }
+        }
+        return completions;
     }
 }
