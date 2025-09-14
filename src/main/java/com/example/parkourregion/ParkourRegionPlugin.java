@@ -2,10 +2,11 @@ package com.example.parkourregion;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class ParkourRegionPlugin extends JavaPlugin {
+public class ParkourRegionPlugin extends JavaPlugin {
 
     private static ParkourRegionPlugin instance;
     private RegionManager regionManager;
+    private MessageManager messageManager;
 
     @Override
     public void onEnable() {
@@ -14,17 +15,14 @@ public final class ParkourRegionPlugin extends JavaPlugin {
         saveDefaultConfig();
         saveResource("messages.yml", false);
 
-        regionManager = new RegionManager(this);
-        getServer().getPluginManager().registerEvents(new MovementListener(regionManager), this);
-        getServer().getPluginManager().registerEvents(new InteractionListener(regionManager), this);
+        this.regionManager = new RegionManager(this);
+        this.messageManager = new MessageManager(this);
 
-        getCommand("por").setExecutor(new ParkourCommand(regionManager));
-        getCommand("por").setTabCompleter(new ParkourTabCompleter(regionManager));
-    }
+        getCommand("por").setExecutor(new ParkourCommand(this));
+        getCommand("por").setTabCompleter(new ParkourTabCompleter(this));
 
-    @Override
-    public void onDisable() {
-        regionManager.saveRegions();
+        getServer().getPluginManager().registerEvents(new MovementListener(this), this);
+        getServer().getPluginManager().registerEvents(new InteractionListener(this), this);
     }
 
     public static ParkourRegionPlugin getInstance() {
@@ -33,5 +31,9 @@ public final class ParkourRegionPlugin extends JavaPlugin {
 
     public RegionManager getRegionManager() {
         return regionManager;
+    }
+
+    public MessageManager getMessageManager() {
+        return messageManager;
     }
 }
