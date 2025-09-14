@@ -9,8 +9,7 @@ public class CooldownManager {
     private final Map<String, Map<UUID, Long>> cooldowns = new HashMap<>();
 
     public boolean isOnCooldown(String region, UUID player) {
-        if (!cooldowns.containsKey(region)) return false;
-        return cooldowns.get(region).getOrDefault(player, 0L) > System.currentTimeMillis();
+        return cooldowns.containsKey(region) && cooldowns.get(region).getOrDefault(player, 0L) > System.currentTimeMillis();
     }
 
     public long getRemaining(String region, UUID player) {
