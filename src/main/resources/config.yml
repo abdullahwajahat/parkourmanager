@@ -1,0 +1,4 @@
+# global defaults and settings
+blacklist-default:
+- CHEST
+cooldown-default: 0
