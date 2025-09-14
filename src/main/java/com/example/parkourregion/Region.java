@@ -1,38 +1,36 @@
 package com.example.parkourregion;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class RegionManager {
+public class Region {
 
-    private final ParkourRegionPlugin plugin;
-    private final Map<String, Region> regions = new HashMap<>();
+    private final String name;
+    private final Location min;
+    private final Location max;
+    private final List<Material> blacklistedBlocks;
 
-    public RegionManager(ParkourRegionPlugin plugin) {
-        this.plugin = plugin;
+    public Region(String name, Location min, Location max, List<Material> blacklistedBlocks) {
+        this.name = name;
+        this.min = min;
+        this.max = max;
+        this.blacklistedBlocks = blacklistedBlocks;
     }
 
-    public Map<String, Region> getRegions() {
-        return regions;
+    public String getName() {
+        return name;
     }
 
-    public void addRegion(String name, Location min, Location max, List<Material> blacklist) {
-        regions.put(name, new Region(name, min, max, blacklist));
+    public List<Material> getBlacklistedBlocks() {
+        return blacklistedBlocks;
     }
 
-    public Region getRegion(String name) {
-        return regions.get(name);
-    }
-
-    public Region getRegionAt(Location loc) {
-        for (Region region : regions.values()) {
-            if (region.contains(loc)) return region;
-        }
-        return null;
+    public boolean contains(Location loc) {
+        return loc.getWorld().equals(min.getWorld()) &&
+                loc.getBlockX() >= min.getBlockX() && loc.getBlockX() <= max.getBlockX() &&
+                loc.getBlockY() >= min.getBlockY() && loc.getBlockY() <= max.getBlockY() &&
+                loc.getBlockZ() >= min.getBlockZ() && loc.getBlockZ() <= max.getBlockZ();
     }
 }
