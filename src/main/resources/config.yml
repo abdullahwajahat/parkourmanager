@@ -1,3 +1,54 @@
+
+# ==========================
+# Parkour Region Plugin Config
+# ==========================
+
+# Sounds (Bukkit sound names)
+sounds:
+  start: "ENTITY_PLAYER_LEVELUP"
+  checkpoint: "ENTITY_EXPERIENCE_ORB_PICKUP"
+  fall: "ENTITY_ENDERMAN_TELEPORT"
+  finish: "ENTITY_FIREWORK_ROCKET_LAUNCH"
+
+# Regions (you can add multiple)
+regions:
+  exampleRegion:
+    start:
+      world: "world"
+      x: 100
+      y: 65
+      z: 100
+    finish:
+      world: "world"
+      x: 200
+      y: 70
+      z: 200
+    fallY: 50  # players falling below this Y will teleport to start/checkpoint
+    blacklisted-blocks:
+      - LAVA
+      - FIRE
+      - MAGMA_BLOCK
+      - BEDROCK
+    checkpoints:
+      - world: "world"
+        x: 120
+        y: 65
+        z: 120
+      - world: "world"
+        x: 140
+        y: 66
+        z: 140
+    finish-commands:
+      - "say %player% completed the parkour!"
+      - "give %player% diamond 1"
+
+# Enable or disable tab completion globally
+tab-completion: true
+
+# Strict mode for starting parkour
+strict-start: true
+# If true, player can only activate checkpoints or finish if they started at the start block
+
 # global defaults and settings
 blacklist-default:
 - CHEST
