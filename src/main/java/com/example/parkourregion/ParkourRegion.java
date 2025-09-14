@@ -1,29 +1,19 @@
 package com.example.parkourregion;
 
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.example.parkourregion.commands.ParkourCommand;
-import com.example.parkourregion.commands.ParkourGUICommand;
 import com.example.parkourregion.managers.RegionManager;
+import com.example.parkourregion.commands.ParkourCommand;
 
 public final class ParkourRegion extends JavaPlugin {
 
-    private static ParkourRegion instance;
     private RegionManager regionManager;
 
     @Override
     public void onEnable() {
-        instance = this;
-
         saveDefaultConfig();
-        saveResource("messages.yml", false);
-
-        regionManager = new RegionManager(this);
-
-        getCommand("por").setExecutor(new ParkourCommand());
-        getCommand("por").setTabCompleter(new ParkourCommand());
-        getCommand("por").setExecutor(new ParkourGUICommand());
-
+        this.regionManager = new RegionManager(this);
+        getCommand("por").setExecutor(new ParkourCommand(regionManager));
+        getCommand("por").setTabCompleter(new ParkourCommand(regionManager));
         getLogger().info("ParkourRegion enabled!");
     }
 
@@ -31,10 +21,6 @@ public final class ParkourRegion extends JavaPlugin {
     public void onDisable() {
         regionManager.saveRegions();
         getLogger().info("ParkourRegion disabled!");
-    }
-
-    public static ParkourRegion getInstance() {
-        return instance;
     }
 
     public RegionManager getRegionManager() {
