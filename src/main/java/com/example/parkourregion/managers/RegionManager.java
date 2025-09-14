@@ -51,10 +51,20 @@ public class RegionManager {
             config.set(path + ".locked", region.isLocked());
             if (region.getYAxis() != null) config.set(path + ".yAxis", region.getYAxis());
             config.set(path + ".blacklist", new ArrayList<>(region.getBlacklistBlocks()));
-            Map<Integer, String> checkpoints = new HashMap<>();
-            for (Map.Entry<Integer, Location> entry : region.getCheckpoints().entrySet()) {
-                checkpoints.put(entry.getKey(), serializeLocation(entry.getValue()));
+            // Assuming you have regionConfig as a ConfigurationSection
+            Map<Integer, Location> checkpoints = new HashMap<>();
+            
+            if (regionConfig.contains("checkpoints")) {
+                Map<String, Object> rawCheckpoints = regionConfig.getConfigurationSection("checkpoints").getValues(false);
+                for (Map.Entry<String, Object> entry : rawCheckpoints.entrySet()) {
+                    int key = Integer.parseInt(entry.getKey());
+                    Location loc = deserializeLocation(entry.getValue().toString());
+                    checkpoints.put(key, loc);
+                }
             }
+            
+            region.setCheckpoints(checkpoints);
+
             config.set(path + ".checkpoints", checkpoints);
         }
         plugin.saveConfig();
