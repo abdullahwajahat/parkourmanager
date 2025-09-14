@@ -1,0 +1,13 @@
+name: ParkourRegion
+main: com.example.parkourregion.ParkourRegionPlugin
+version: 1.0.0
+api-version: 1.20
+commands:
+parkourregion:
+description: Manage parkour regions
+aliases: [por]
+usage: /parkourregion <subcommand>
+permissions:
+parkourregion.admin:
+description: Admin permission for region management
+default: op
