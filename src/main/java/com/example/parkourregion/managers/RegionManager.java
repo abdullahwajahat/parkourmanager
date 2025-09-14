@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+
 import java.util.*;
 
 public class RegionManager {
@@ -33,11 +34,14 @@ public class RegionManager {
             if (section.contains("pos2")) region.setPos2(deserializeLocation(section.getConfigurationSection("pos2")));
             if (section.contains("start")) region.setStart(deserializeLocation(section.getConfigurationSection("start")));
             if (section.contains("finish")) region.setFinish(deserializeLocation(section.getConfigurationSection("finish")));
+            if (section.contains("finishTeleport")) region.setFinishTeleport(deserializeLocation(section.getConfigurationSection("finishTeleport")));
+
             if (section.contains("checkpoints")) {
                 for (String key : section.getConfigurationSection("checkpoints").getKeys(false)) {
                     region.getCheckpoints().put(Integer.parseInt(key), deserializeLocation(section.getString("checkpoints." + key)));
                 }
             }
+
             if (section.contains("blacklist")) {
                 for (String mat : section.getStringList("blacklist")) region.getBlacklist().add(Material.getMaterial(mat));
             }
@@ -57,6 +61,7 @@ public class RegionManager {
             if (region.getPos2() != null) config.set(path + ".pos2", serializeLocationMap(region.getPos2()));
             if (region.getStart() != null) config.set(path + ".start", serializeLocationMap(region.getStart()));
             if (region.getFinish() != null) config.set(path + ".finish", serializeLocationMap(region.getFinish()));
+            if (region.getFinishTeleport() != null) config.set(path + ".finishTeleport", serializeLocationMap(region.getFinishTeleport()));
 
             Map<Integer, String> cps = new HashMap<>();
             for (var e : region.getCheckpoints().entrySet()) cps.put(e.getKey(), serializeLocation(e.getValue()));
