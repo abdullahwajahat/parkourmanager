@@ -1,22 +1,16 @@
 package com.example.parkourregion;
 
-import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.bukkit.entity.Player;
 
 public class MovementListener implements Listener {
 
-    private final ParkourRegion plugin;
-    private final Map<Player, Location> lastSafeLocation = new HashMap<>();
+    private final RegionManager regionManager;
 
-    public MovementListener(ParkourRegion plugin) {
-        this.plugin = plugin;
+    public MovementListener(RegionManager regionManager) {
+        this.regionManager = regionManager;
     }
 
     @EventHandler
