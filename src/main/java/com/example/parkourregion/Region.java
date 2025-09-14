@@ -1,36 +1,38 @@
 package com.example.parkourregion;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class Region {
+public class RegionManager {
 
-    private final String name;
-    private final Location min;
-    private final Location max;
-    private final List<Material> blacklistedBlocks;
+    private final ParkourRegionPlugin plugin;
+    private final Map<String, Region> regions = new HashMap<>();
 
-    public Region(String name, Location min, Location max, List<Material> blacklistedBlocks) {
-        this.name = name;
-        this.min = min;
-        this.max = max;
-        this.blacklistedBlocks = blacklistedBlocks;
+    public RegionManager(ParkourRegionPlugin plugin) {
+        this.plugin = plugin;
     }
 
-    public String getName() {
-        return name;
+    public Map<String, Region> getRegions() {
+        return regions;
     }
 
-    public List<Material> getBlacklistedBlocks() {
-        return blacklistedBlocks;
+    public void addRegion(String name, Location min, Location max, List<Material> blacklist) {
+        regions.put(name, new Region(name, min, max, blacklist));
     }
 
-    public boolean contains(Location loc) {
-        return loc.getWorld().equals(min.getWorld()) &&
-                loc.getBlockX() >= min.getBlockX() && loc.getBlockX() <= max.getBlockX() &&
-                loc.getBlockY() >= min.getBlockY() && loc.getBlockY() <= max.getBlockY() &&
-                loc.getBlockZ() >= min.getBlockZ() && loc.getBlockZ() <= max.getBlockZ();
+    public Region getRegion(String name) {
+        return regions.get(name);
+    }
+
+    public Region getRegionAt(Location loc) {
+        for (Region region : regions.values()) {
+            if (region.contains(loc)) return region;
+        }
+        return null;
     }
 }
