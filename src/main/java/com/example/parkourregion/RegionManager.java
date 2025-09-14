@@ -1,72 +1,48 @@
+// File: src/main/java/com/example/parkourregion/RegionManager.java
 package com.example.parkourregion;
 
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class RegionManager {
 
     private final ParkourRegionPlugin plugin;
-    private final Map<String, Region> regions = new HashMap<>();
-    private final File regionFile;
-    private final YamlConfiguration regionConfig;
+    private final Map<String, Region> regions;
 
     public RegionManager(ParkourRegionPlugin plugin) {
         this.plugin = plugin;
-        regionFile = new File(plugin.getDataFolder(), "regions.yml");
-
-        if (!regionFile.exists()) {
-            plugin.saveResource("regions.yml", false);
-        }
-
-        regionConfig = YamlConfiguration.loadConfiguration(regionFile);
+        this.regions = new HashMap<>();
         loadRegions();
-    }
-
-    public void loadRegions() {
-        regions.clear();
-        for (String key : regionConfig.getKeys(false)) {
-            Location min = regionConfig.getLocation(key + ".min");
-            Location max = regionConfig.getLocation(key + ".max");
-            List<String> blacklist = regionConfig.getStringList(key + ".blacklist");
-            int cooldown = regionConfig.getInt(key + ".cooldown", plugin.getConfig().getInt("cooldown-default"));
-            regions.put(key, new Region(key, min, max, blacklist, cooldown));
-        }
-    }
-
-    public void saveRegions() {
-        for (Map.Entry<String, Region> entry : regions.entrySet()) {
-            Region r = entry.getValue();
-            regionConfig.set(entry.getKey() + ".min", r.getMin());
-            regionConfig.set(entry.getKey() + ".max", r.getMax());
-            regionConfig.set(entry.getKey() + ".blacklist", r.getBlacklist());
-            regionConfig.set(entry.getKey() + ".cooldown", r.getCooldown());
-        }
-        try {
-            regionConfig.save(regionFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public Map<String, Region> getRegions() {
         return regions;
     }
 
-    public void addRegion(Region region) {
-        regions.put(region.getName(), region);
-        saveRegions();
+    public void addRegion(String name, Region region) {
+        regions.put(name, region);
+        saveRegion(name, region);
     }
 
-    public void removeRegion(String name) {
-        regions.remove(name);
-        regionConfig.set(name, null);
-        saveRegions();
+    public void saveRegion(String name, Region region) {
+        FileConfiguration config = plugin.getConfig();
+        config.set("regions." + name + ".start", region.getStartLocationString());
+        config.set("regions." + name + ".end", region.getEndLocationString());
+        config.set("regions." + name + ".blacklist", region.getBlacklist());
+        plugin.saveConfig();
+    }
+
+    public void loadRegions() {
+        FileConfiguration config = plugin.getConfig();
+        if (!config.isConfigurationSection("regions")) return;
+        for (String key : config.getConfigurationSection("regions").getKeys(false)) {
+            Location start = Region.stringToLocation(config.getString("regions." + key + ".start"));
+            Location end = Region.stringToLocation(config.getString("regions." + key + ".end"));
+            regions.put(key, new Region(start, end, config.getStringList("regions." + key + ".blacklist")));
+        }
     }
 }
