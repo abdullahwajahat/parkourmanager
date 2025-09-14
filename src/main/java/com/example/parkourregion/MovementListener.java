@@ -1,24 +1,29 @@
 package com.example.parkourregion;
 
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.entity.Player;
 import org.bukkit.Material;
 
 public class MovementListener implements Listener {
 
-    private final ParkourRegionPlugin plugin;
+    private final RegionManager regionManager;
 
-    public MovementListener(ParkourRegionPlugin plugin) {
-        this.plugin = plugin;
+    public MovementListener(RegionManager regionManager) {
+        this.regionManager = regionManager;
     }
 
     @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-        Region region = plugin.getRegionManager().getRegionAt(event.getPlayer().getLocation());
-        if (region != null && region.getBlacklistedBlocks() != null) {
-            if (region.getBlacklistedBlocks().contains(event.getPlayer().getLocation().getBlock().getType())) {
-                event.getPlayer().sendMessage("§cYou stepped on a blacklisted block!");
+    public void onMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        for (Region region : regionManager.getRegions().values()) {
+            if (region.contains(player.getLocation())) {
+                for (String blk : region.getBlacklist()) {
+                    if (player.getLocation().getBlock().getType().name().equalsIgnoreCase(blk)) {
+                        player.sendMessage("§cYou stepped on a blacklisted block!");
+                    }
+                }
             }
         }
     }
