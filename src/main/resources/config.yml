@@ -1,6 +1,2 @@
-# File: config.yml
-blacklist-default:
-- CHEST
-cooldown-default: 0
-
 regions: {}
+cooldowns: {}
