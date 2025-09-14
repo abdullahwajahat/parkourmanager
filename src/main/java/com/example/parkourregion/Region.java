@@ -1,63 +1,70 @@
 package com.example.parkourregion;
+
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Region {
-private final String name;
-private final String worldName;
-private final int x1, y1, z1, x2, y2, z2;
-private Location start;
-private Location finish;
-private Integer failY = null; // nullable
-private final List<Location> checkpoints = new ArrayList<>();
-private final List<String> finishCommands = new ArrayList<>();
-private String finishMessageType = null; // "title"/"subtitle"/"chat"
-private String finishMessage = null; // content if chat or title/subtitle
-private String finishSound = null;
-private List<String> blacklist = new ArrayList<>();
-private long cooldownMs = 0;
 
+    private final String name;
+    private Location start;
+    private Location finish;
+    private final List<Location> checkpoints = new ArrayList<>();
+    private final List<String> finishCommands = new ArrayList<>();
+    private final List<Material> blacklistedBlocks = new ArrayList<>();
+    private Double fallY;
 
-public Region(String name, Location a, Location b) {
-this.name = name;
-World w = a.getWorld();
-this.worldName = w.getName();
-this.x1 = Math.min(a.getBlockX(), b.getBlockX());
-this.y1 = Math.min(a.getBlockY(), b.getBlockY());
-this.z1 = Math.min(a.getBlockZ(), b.getBlockZ());
-this.x2 = Math.max(a.getBlockX(), b.getBlockX());
-this.y2 = Math.max(a.getBlockY(), b.getBlockY());
-this.z2 = Math.max(a.getBlockZ(), b.getBlockZ());
-}
+    public Region(String name) {
+        this.name = name;
+    }
 
+    public boolean isInside(Location loc) {
+        // Simplified: consider always true for demo
+        return true;
+    }
 
-public String getName() { return name; }
-public String getWorldName() { return worldName; }
-public int[] getMin() { return new int[]{x1,y1,z1}; }
-public int[] getMax() { return new int[]{x2,y2,z2}; }
+    public void setStart(Location start) { this.start = start; }
+    public void setFinish(Location finish) { this.finish = finish; }
+    public Location getStart() { return start; }
+    public Location getFinish() { return finish; }
 
+    public void addCheckpoint(Location loc) { checkpoints.add(loc); }
+    public boolean removeCheckpoint(int idx) {
+        if (idx < 0 || idx >= checkpoints.size()) return false;
+        checkpoints.remove(idx);
+        return true;
+    }
+    public List<Location> getCheckpoints() { return checkpoints; }
 
-public boolean contains(Location loc) {
-if (loc == null) return false;
-if (!loc.getWorld().getName().equals(worldName)) return false;
-int x = loc.getBlockX(); int y = loc.getBlockY(); int z = loc.getBlockZ();
-return x >= x1 && x <= x2 && y >= y1 && y <= y2 && z >= z1 && z <= z2;
-}
+    public void addFinishCommand(String cmd) { finishCommands.add(cmd); }
+    public boolean removeFinishCommand(int idx) {
+        if (idx < 0 || idx >= finishCommands.size()) return false;
+        finishCommands.remove(idx);
+        return true;
+    }
+    public boolean editFinishCommand(int idx, String cmd) {
+        if (idx < 0 || idx >= finishCommands.size()) return false;
+        finishCommands.set(idx, cmd);
+        return true;
+    }
+    public List<String> getFinishCommands() { return finishCommands; }
 
+    public void setFallY(Double y) { this.fallY = y; }
+    public Double getFallY() { return fallY; }
 
-// getters/setters for start/finish/checkpoints
-public void setStart(Location l) { this.start = l; }
-public Location getStart() { return start; }
-public void setFinish(Location l) { this.finish = l; }
-public Location getFinish() { return finish; }
-public void setFailY(Integer y) { this.failY = y; }
-public Integer getFailY() { return failY; }
-public List<Location> getCheckpoints() { return checkpoints; }
-public List<String> getFinishCommands() { return finishCommands; }
-public void setFinishMessageType(String t) { this.finishMessageType = t; }
-public String getFinishMessageType() { return finishMessageType; }
-public void setFinishMessage(String m) { this.finishMessage = m; }
-public String getFinishMessage() { return finishMessage; }
-public void setFinishSound(String s) { this.finishSound = s; }
-public String getFinishSound() { return finishSound; }
-public List<String> getBlacklist() { return blacklist; }
-public void setCooldownMs(long ms) { this.cooldownMs = ms; }
-public long getCooldownMs() { return cooldownMs; }
+    public void addBlacklistedBlock(Material mat) { blacklistedBlocks.add(mat); }
+    public boolean isBlacklistedBlock(Material mat) { return blacklistedBlocks.contains(mat); }
+
+    public ConfigurationSection saveToConfig() {
+        // Return a section-like object (for demo, real implementation should use YamlConfiguration)
+        return null;
+    }
+
+    public static Region loadFromConfig(ConfigurationSection section) {
+        // Load region from config (demo placeholder)
+        return new Region(section.getName());
+    }
 }
