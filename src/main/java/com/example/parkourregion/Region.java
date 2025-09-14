@@ -1,7 +1,6 @@
 package com.example.parkourregion;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 
 import java.util.List;
 
@@ -10,27 +9,41 @@ public class Region {
     private final String name;
     private final Location min;
     private final Location max;
-    private final List<Material> blacklistedBlocks;
+    private final List<String> blacklist;
+    private final int cooldown;
 
-    public Region(String name, Location min, Location max, List<Material> blacklistedBlocks) {
+    public Region(String name, Location min, Location max, List<String> blacklist, int cooldown) {
         this.name = name;
         this.min = min;
         this.max = max;
-        this.blacklistedBlocks = blacklistedBlocks;
+        this.blacklist = blacklist;
+        this.cooldown = cooldown;
     }
 
     public String getName() {
         return name;
     }
 
-    public List<Material> getBlacklistedBlocks() {
-        return blacklistedBlocks;
+    public Location getMin() {
+        return min;
+    }
+
+    public Location getMax() {
+        return max;
+    }
+
+    public List<String> getBlacklist() {
+        return blacklist;
+    }
+
+    public int getCooldown() {
+        return cooldown;
     }
 
     public boolean contains(Location loc) {
-        return loc.getWorld().equals(min.getWorld()) &&
-                loc.getBlockX() >= min.getBlockX() && loc.getBlockX() <= max.getBlockX() &&
-                loc.getBlockY() >= min.getBlockY() && loc.getBlockY() <= max.getBlockY() &&
-                loc.getBlockZ() >= min.getBlockZ() && loc.getBlockZ() <= max.getBlockZ();
+        if (!loc.getWorld().equals(min.getWorld())) return false;
+        return loc.getX() >= min.getX() && loc.getX() <= max.getX()
+                && loc.getY() >= min.getY() && loc.getY() <= max.getY()
+                && loc.getZ() >= min.getZ() && loc.getZ() <= max.getZ();
     }
 }
