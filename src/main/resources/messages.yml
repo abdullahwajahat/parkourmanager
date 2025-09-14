@@ -1,25 +1,16 @@
+# File: messages.yml
 messages:
-  start:
-    message: "&aParkour started!"
-    sound: "BLOCK_NOTE_BLOCK_PLING"
-
+  start: "&aParkour started!"
   checkpoint:
     message: "&aCheckpoint reached!"
     sound: "BLOCK_NOTE_BLOCK_PLING"
-
   finish:
     messages:
       - "&aCongrats %player%, you finished!"
       - "&bWell done, %player%!"
       - "&e%player% completed the course!"
     sound: "ENTITY_PLAYER_LEVELUP"
-
   fail:
     enabled: true
     message: "&c&lYou Fell!"
     sound: "ENTITY_ENDERMAN_TELEPORT"
-
-  region-created: "&aRegion {region} created!"
-  region-deleted: "&aRegion {region} deleted!"
-  blacklisted-block-message: "&cYou cannot place or break this block!"
-  player-step-blacklisted: "&cYou stepped on a blacklisted block!"
