@@ -1,13 +1,12 @@
+# File: src/main/resources/plugin.yml
 name: ParkourRegion
-main: com.example.parkourregion.ParkourRegionPlugin
 version: 1.0.0
+main: com.example.parkourregion.ParkourRegionPlugin
 api-version: 1.20
 commands:
-parkourregion:
-description: Manage parkour regions
-aliases: [por]
-usage: /parkourregion <subcommand>
-permissions:
-parkourregion.admin:
-description: Admin permission for region management
-default: op
+  por:
+    description: Main parkour command
+    usage: /por <subcommand>
+    aliases: []
+    permission: parkourregion.use
+    permission-message: "&cYou do not have permission to use this command."
