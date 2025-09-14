@@ -1,16 +1,9 @@
-# File: messages.yml
-messages:
-  start: "&aParkour started!"
-  checkpoint:
-    message: "&aCheckpoint reached!"
-    sound: "BLOCK_NOTE_BLOCK_PLING"
-  finish:
-    messages:
-      - "&aCongrats %player%, you finished!"
-      - "&bWell done, %player%!"
-      - "&e%player% completed the course!"
-    sound: "ENTITY_PLAYER_LEVELUP"
-  fail:
-    enabled: true
-    message: "&c&lYou Fell!"
-    sound: "ENTITY_ENDERMAN_TELEPORT"
+region_select_first: "&cYou must select the region first using /por pos1 and /por pos2."
+region_name_required: "&cPlease provide a name for the region."
+region_created: "&aRegion &b{region} &ahas been created! Now set the start point using /por setstart."
+start_set: "&aStart point set at your current location."
+checkpoint_set: "&aCheckpoint {number} set at your location."
+finish_set: "&aFinish area set successfully."
+region_deleted: "&cRegion &b{region} &chas been deleted."
+locked: "&cThis region is locked and cannot be edited."
+unlocked: "&aThis region is now unlocked."
