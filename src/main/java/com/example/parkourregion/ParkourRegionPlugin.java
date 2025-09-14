@@ -4,20 +4,31 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ParkourRegionPlugin extends JavaPlugin {
 
+    private static ParkourRegionPlugin instance;
     private RegionManager regionManager;
 
     @Override
     public void onEnable() {
+        instance = this;
+
         saveDefaultConfig();
+        saveResource("messages.yml", false);
+
         regionManager = new RegionManager(this);
+        getServer().getPluginManager().registerEvents(new MovementListener(regionManager), this);
+        getServer().getPluginManager().registerEvents(new InteractionListener(regionManager), this);
 
-        // Register commands
-        getCommand("por").setExecutor(new ParkourCommand(this));
-        getCommand("por").setTabCompleter(new ParkourTabCompleter(this));
+        getCommand("por").setExecutor(new ParkourCommand(regionManager));
+        getCommand("por").setTabCompleter(new ParkourTabCompleter(regionManager));
+    }
 
-        // Register listeners
-        getServer().getPluginManager().registerEvents(new MovementListener(this), this);
-        getServer().getPluginManager().registerEvents(new InteractionListener(this), this);
+    @Override
+    public void onDisable() {
+        regionManager.saveRegions();
+    }
+
+    public static ParkourRegionPlugin getInstance() {
+        return instance;
     }
 
     public RegionManager getRegionManager() {
