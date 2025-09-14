@@ -1,48 +1,38 @@
 package com.example.parkourregion;
 
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RegionManager {
 
-    private final JavaPlugin plugin;
+    private final ParkourRegionPlugin plugin;
     private final Map<String, Region> regions = new HashMap<>();
 
-    public RegionManager(JavaPlugin plugin) {
+    public RegionManager(ParkourRegionPlugin plugin) {
         this.plugin = plugin;
-    }
-
-    public void createRegion(String name) {
-        regions.put(name, new Region(name));
-    }
-
-    public Region getRegion(String name) {
-        return regions.get(name);
     }
 
     public Map<String, Region> getRegions() {
         return regions;
     }
 
-    public void loadRegions() {
-        ConfigurationSection section = plugin.getConfig().getConfigurationSection("regions");
-        if (section == null) return;
-
-        for (String key : section.getKeys(false)) {
-            Region r = Region.loadFromConfig(section.getConfigurationSection(key));
-            regions.put(key, r);
-        }
+    public void addRegion(String name, Location min, Location max, List<Material> blacklist) {
+        regions.put(name, new Region(name, min, max, blacklist));
     }
 
-    public void saveRegions() {
-        ConfigurationSection section = plugin.getConfig().createSection("regions");
-        for (Region r : regions.values()) {
-            ConfigurationSection rSec = section.createSection(r.getName());
-            r.saveToConfig(rSec);
+    public Region getRegion(String name) {
+        return regions.get(name);
+    }
+
+    public Region getRegionAt(Location loc) {
+        for (Region region : regions.values()) {
+            if (region.contains(loc)) return region;
         }
-        plugin.saveConfig();
+        return null;
     }
 }
