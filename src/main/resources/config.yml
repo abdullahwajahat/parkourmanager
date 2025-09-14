@@ -2,14 +2,6 @@
 # ==========================
 # Parkour Region Plugin Config
 # ==========================
-
-# Sounds (Bukkit sound names)
-sounds:
-  start: "ENTITY_PLAYER_LEVELUP"
-  checkpoint: "ENTITY_EXPERIENCE_ORB_PICKUP"
-  fall: "ENTITY_ENDERMAN_TELEPORT"
-  finish: "ENTITY_FIREWORK_ROCKET_LAUNCH"
-
 # Regions (you can add multiple)
 regions:
   exampleRegion:
