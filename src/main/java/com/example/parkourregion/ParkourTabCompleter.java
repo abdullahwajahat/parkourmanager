@@ -9,10 +9,10 @@ import java.util.List;
 
 public class ParkourTabCompleter implements TabCompleter {
 
-    private final ParkourRegionPlugin plugin;
+    private final RegionManager regionManager;
 
-    public ParkourTabCompleter(ParkourRegionPlugin plugin) {
-        this.plugin = plugin;
+    public ParkourTabCompleter(RegionManager regionManager) {
+        this.regionManager = regionManager;
     }
 
     @Override
@@ -20,8 +20,9 @@ public class ParkourTabCompleter implements TabCompleter {
         List<String> completions = new ArrayList<>();
         if (args.length == 1) {
             completions.add("create");
+            completions.add("delete");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("delete")) {
-            completions.addAll(plugin.getRegionManager().getRegions().keySet());
+            completions.addAll(regionManager.getRegions().keySet());
         }
         return completions;
     }
