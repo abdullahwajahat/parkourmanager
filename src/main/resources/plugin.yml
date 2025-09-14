@@ -8,6 +8,11 @@ commands:
     description: Main ParkourRegion command
     usage: /por <subcommand>
     permission: parkourregion.admin
+    tab-completion:
+      - create
+      - setstart
+      - setend
+      - addcheckpoint
 permissions:
   parkourregion.admin:
     description: Full access to all ParkourRegion commands
