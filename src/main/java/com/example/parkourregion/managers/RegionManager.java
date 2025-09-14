@@ -4,6 +4,7 @@ import com.example.parkourregion.ParkourRegion;
 import com.example.parkourregion.objects.ParkourRegionObject;
 
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
