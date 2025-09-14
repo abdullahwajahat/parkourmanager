@@ -1,17 +1,16 @@
+// File: src/main/java/com/example/parkourregion/MovementListener.java
 package com.example.parkourregion;
 
-import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.entity.Player;
-import org.bukkit.Material;
 
 public class MovementListener implements Listener {
 
-    private final RegionManager regionManager;
+    private final ParkourRegionPlugin plugin;
 
-    public MovementListener(RegionManager regionManager) {
-        this.regionManager = regionManager;
+    public MovementListener(ParkourRegionPlugin plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler
@@ -28,3 +27,4 @@ public class MovementListener implements Listener {
         }
     }
 }
+
