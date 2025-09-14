@@ -2,37 +2,57 @@
 package com.example.parkourregion;
 
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Region {
 
-    private Location start;
-    private List<String> blacklist = new ArrayList<>();
+    private final String name;
+    private final Location start;
+    private final Location end;
+    private final List<String> blacklist;
 
-    public boolean contains(Location loc) {
-        // Example check, implement your region bounds logic
-        return loc.getWorld().equals(start.getWorld())
-                && loc.getX() >= start.getX() && loc.getX() <= end.getX()
-                && loc.getY() >= start.getY() && loc.getY() <= end.getY()
-                && loc.getZ() >= start.getZ() && loc.getZ() <= end.getZ();
+    public Region(String name, Location start, Location end, List<String> blacklist) {
+        this.name = name;
+        this.start = start;
+        this.end = end;
+        this.blacklist = blacklist != null ? blacklist : new ArrayList<>();
     }
 
-    public void setStart(Location start) {
-        this.start = start;
+    public String getName() {
+        return name;
     }
 
     public Location getStart() {
         return start;
     }
 
+    public Location getEnd() {
+        return end;
+    }
+
     public List<String> getBlacklist() {
         return blacklist;
     }
 
-    public void setBlacklist(List<String> blacklist) {
-        this.blacklist = blacklist;
+    public boolean contains(Location loc) {
+        if (!loc.getWorld().equals(start.getWorld())) return false;
+
+        double x = loc.getX();
+        double y = loc.getY();
+        double z = loc.getZ();
+
+        double minX = Math.min(start.getX(), end.getX());
+        double minY = Math.min(start.getY(), end.getY());
+        double minZ = Math.min(start.getZ(), end.getZ());
+
+        double maxX = Math.max(start.getX(), end.getX());
+        double maxY = Math.max(start.getY(), end.getY());
+        double maxZ = Math.max(start.getZ(), end.getZ());
+
+        return x >= minX && x <= maxX &&
+               y >= minY && y <= maxY &&
+               z >= minZ && z <= maxZ;
     }
 }
