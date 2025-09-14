@@ -1,162 +1,196 @@
 package com.example.parkourregion.commands;
 
-import com.example.parkourregion.ParkourRegion;
-import com.example.parkourregion.managers.RegionManager;
-import com.example.parkourregion.objects.ParkourRegionObject;
-import com.example.parkourregion.utils.MessageUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.command.*;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.Location;
+import com.example.parkourregion.managers.RegionManager;
+import com.example.parkourregion.managers.Region;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ParkourCommand implements CommandExecutor, TabCompleter {
 
-    private final RegionManager regionManager = ParkourRegion.getInstance().getRegionManager();
-    private final Map<UUID, Location[]> selectionMap = new HashMap<>();
+    private final RegionManager regionManager;
+
+    public ParkourCommand(RegionManager manager) {
+        this.regionManager = manager;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player p)) {
-            sender.sendMessage(MessageUtil.color("&cOnly players can run this command."));
-            return true;
-        }
-
-        if (!p.hasPermission("parkourregion.admin")) {
-            p.sendMessage(MessageUtil.get("no_permission"));
-            return true;
-        }
+        if (!(sender instanceof Player player)) return true;
 
         if (args.length == 0) {
-            p.sendMessage(MessageUtil.color("&aUsage: /por <create/setstart/setcheckpoint/setfinish/edit/lock/unlock/info/list>"));
+            sendUsage(player);
             return true;
         }
 
-        switch (args[0].toLowerCase()) {
+        String sub = args[0].toLowerCase();
 
-            case "pos1":
-                selectionMap.putIfAbsent(p.getUniqueId(), new Location[2]);
-                selectionMap.get(p.getUniqueId())[0] = p.getLocation();
-                p.sendMessage(MessageUtil.color("&aPosition 1 set!"));
-                break;
-
-            case "pos2":
-                selectionMap.putIfAbsent(p.getUniqueId(), new Location[2]);
-                selectionMap.get(p.getUniqueId())[1] = p.getLocation();
-                p.sendMessage(MessageUtil.color("&aPosition 2 set!"));
-                break;
-
+        switch (sub) {
             case "create":
-                Location[] sel = selectionMap.get(p.getUniqueId());
-                if (sel == null || sel[0] == null || sel[1] == null) {
-                    p.sendMessage(MessageUtil.get("region_select_first"));
-                    return true;
-                }
+                if (args.length < 2) { sendUsage(player); return true; }
+                createRegion(player, args[1]);
+                break;
 
-                if (args.length == 1) {
-                    p.sendMessage(MessageUtil.get("region_name_required"));
-                    return true;
-                }
-
-                String name = args[1];
-                if (regionManager.getRegion(name) != null) {
-                    p.sendMessage(MessageUtil.color("&cRegion &b" + name + "&c already exists!"));
-                    return true;
-                }
-
-                ParkourRegionObject region = new ParkourRegionObject(name);
-                region.setPos1(sel[0]);
-                region.setPos2(sel[1]);
-                regionManager.addRegion(region);
-                p.sendMessage(MessageUtil.get("region_created"));
+            case "delete":
+                if (args.length < 2) { sendUsage(player); return true; }
+                deleteRegion(player, args[1]);
                 break;
 
             case "setstart":
-                ParkourRegionObject regionStart = regionManager.getRegion(args.length > 1 ? args[1] : "");
-                if (regionStart == null) {
-                    p.sendMessage(MessageUtil.get("invalid_region").replace("{region}", args.length > 1 ? args[1] : ""));
-                    return true;
-                }
-                regionStart.setStart(p.getLocation());
-                regionManager.saveRegions();
-                p.sendMessage(MessageUtil.get("start_set"));
+                if (args.length < 2) { sendUsage(player); return true; }
+                setStart(player, args[1]);
                 break;
 
-            case "setcheckpoint":
-                ParkourRegionObject regionCp = regionManager.getRegion(args.length > 1 ? args[1] : "");
-                if (regionCp == null) {
-                    p.sendMessage(MessageUtil.get("invalid_region").replace("{region}", args.length > 1 ? args[1] : ""));
-                    return true;
-                }
-                int number = 1;
-                if (args.length > 2) {
-                    try { number = Integer.parseInt(args[2]); } catch (NumberFormatException ignored) {}
-                } else {
-                    while (regionCp.getCheckpoints().containsKey(number)) number++;
-                }
-                regionCp.setCheckpoint(number, p.getLocation());
-                regionManager.saveRegions();
-                p.sendMessage(MessageUtil.get("checkpoint_set").replace("{number}", String.valueOf(number)));
+            case "setend":
+                if (args.length < 2) { sendUsage(player); return true; }
+                setEnd(player, args[1]);
                 break;
 
-            case "setfinish":
-                ParkourRegionObject regionFinish = regionManager.getRegion(args.length > 1 ? args[1] : "");
-                if (regionFinish == null) {
-                    p.sendMessage(MessageUtil.get("invalid_region").replace("{region}", args.length > 1 ? args[1] : ""));
-                    return true;
-                }
-                regionFinish.setFinish(p.getLocation());
-                regionManager.saveRegions();
-                p.sendMessage(MessageUtil.get("finish_set"));
+            case "removestart":
+                if (args.length < 2) { sendUsage(player); return true; }
+                removeStart(player, args[1]);
                 break;
 
-            case "lock":
-                if (args.length < 2) { p.sendMessage("&cUsage: /por lock <region>"); return true; }
-                ParkourRegionObject rLock = regionManager.getRegion(args[1]);
-                if (rLock == null) { p.sendMessage(MessageUtil.get("invalid_region").replace("{region}", args[1])); return true; }
-                rLock.setLocked(true);
-                regionManager.saveRegions();
-                p.sendMessage(MessageUtil.get("locked"));
+            case "removeend":
+                if (args.length < 2) { sendUsage(player); return true; }
+                removeEnd(player, args[1]);
                 break;
 
-            case "unlock":
-                if (args.length < 2) { p.sendMessage("&cUsage: /por unlock <region>"); return true; }
-                ParkourRegionObject rUnlock = regionManager.getRegion(args[1]);
-                if (rUnlock == null) { p.sendMessage(MessageUtil.get("invalid_region").replace("{region}", args[1])); return true; }
-                rUnlock.setLocked(false);
-                regionManager.saveRegions();
-                p.sendMessage(MessageUtil.get("unlocked"));
+            case "addcheckpoint":
+                if (args.length < 3) { sendUsage(player); return true; }
+                addCheckpoint(player, args[1], args[2]);
+                break;
+
+            case "removecheckpoint":
+                if (args.length < 3) { sendUsage(player); return true; }
+                removeCheckpoint(player, args[1], args[2]);
                 break;
 
             case "list":
-                Collection<ParkourRegionObject> all = regionManager.getRegions();
-                if (all.isEmpty()) { p.sendMessage("&cNo regions found!"); return true; }
-                p.sendMessage(MessageUtil.color("&aParkour Regions:"));
-                all.forEach(r -> p.sendMessage("&b- " + r.getName()));
+                listRegions(player);
                 break;
 
             default:
-                p.sendMessage("&cUnknown subcommand.");
+                sendUsage(player);
         }
-
         return true;
     }
 
+    private void sendUsage(Player player) {
+        player.sendMessage("§aUsage: /por <create|delete|setstart|setend|removestart|removeend|addcheckpoint|removecheckpoint|list>");
+    }
+
+    private void createRegion(Player player, String name) {
+        if (regionManager.getRegion(name) != null) {
+            player.sendMessage("§cRegion " + name + " already exists!");
+            return;
+        }
+        Region region = new Region(name);
+        regionManager.addRegion(region);
+        regionManager.saveRegions();
+        player.sendMessage("§aRegion " + name + " created!");
+    }
+
+    private void deleteRegion(Player player, String name) {
+        if (regionManager.getRegion(name) == null) {
+            player.sendMessage("§cRegion " + name + " does not exist!");
+            return;
+        }
+        regionManager.getRegions().remove(name);
+        regionManager.saveRegions();
+        player.sendMessage("§aRegion " + name + " deleted!");
+    }
+
+    private void setStart(Player player, String name) {
+        Region region = regionManager.getRegion(name);
+        if (region == null) { player.sendMessage("§cRegion not found!"); return; }
+        region.setStart(player.getLocation());
+        regionManager.saveRegions();
+        player.sendMessage("§aStart point set for region " + name);
+    }
+
+    private void setEnd(Player player, String name) {
+        Region region = regionManager.getRegion(name);
+        if (region == null) { player.sendMessage("§cRegion not found!"); return; }
+        region.setEnd(player.getLocation());
+        regionManager.saveRegions();
+        player.sendMessage("§aEnd point set for region " + name);
+    }
+
+    private void removeStart(Player player, String name) {
+        Region region = regionManager.getRegion(name);
+        if (region == null || region.getStart() == null) { player.sendMessage("§cStart point not set!"); return; }
+        region.setStart(null);
+        regionManager.saveRegions();
+        player.sendMessage("§aStart point removed for region " + name);
+    }
+
+    private void removeEnd(Player player, String name) {
+        Region region = regionManager.getRegion(name);
+        if (region == null || region.getEnd() == null) { player.sendMessage("§cEnd point not set!"); return; }
+        region.setEnd(null);
+        regionManager.saveRegions();
+        player.sendMessage("§aEnd point removed for region " + name);
+    }
+
+    private void addCheckpoint(Player player, String name, String numberStr) {
+        Region region = regionManager.getRegion(name);
+        if (region == null) { player.sendMessage("§cRegion not found!"); return; }
+        int number;
+        try { number = Integer.parseInt(numberStr); } catch (NumberFormatException e) { player.sendMessage("§cInvalid checkpoint number!"); return; }
+        region.getCheckpoints().put(number, player.getLocation());
+        regionManager.saveRegions();
+        player.sendMessage("§aCheckpoint " + number + " added to region " + name);
+    }
+
+    private void removeCheckpoint(Player player, String name, String numberStr) {
+        Region region = regionManager.getRegion(name);
+        if (region == null) { player.sendMessage("§cRegion not found!"); return; }
+        int number;
+        try { number = Integer.parseInt(numberStr); } catch (NumberFormatException e) { player.sendMessage("§cInvalid checkpoint number!"); return; }
+        if (region.getCheckpoints().remove(number) == null) {
+            player.sendMessage("§cCheckpoint " + number + " does not exist!");
+        } else {
+            regionManager.saveRegions();
+            player.sendMessage("§aCheckpoint " + number + " removed from region " + name);
+        }
+    }
+
+    private void listRegions(Player player) {
+        if (regionManager.getRegions().isEmpty()) {
+            player.sendMessage("§cNo regions found!");
+            return;
+        }
+        player.sendMessage("§aRegions:");
+        for (String name : regionManager.getRegions().keySet()) {
+            player.sendMessage(" §7- " + name);
+        }
+    }
+
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("create","pos1","pos2","setstart","setcheckpoint","setfinish","lock","unlock","list")
-                    .stream().filter(s -> s.startsWith(args[0].toLowerCase())).collect(Collectors.toList());
+            List<String> subs = List.of("create","delete","setstart","setend","removestart","removeend","addcheckpoint","removecheckpoint","list");
+            return filterList(subs, args[0]);
         } else if (args.length == 2) {
-            // Suggest region names for second argument
-            return regionManager.getRegions().stream().map(r -> r.getName())
-                    .filter(r -> r.toLowerCase().startsWith(args[1].toLowerCase()))
-                    .toList();
+            // Suggest region names
+            return filterList(new ArrayList<>(regionManager.getRegions().keySet()), args[1]);
         }
         return Collections.emptyList();
     }
-}
 
+    private List<String> filterList(List<String> list, String prefix) {
+        List<String> result = new ArrayList<>();
+        for (String s : list) {
+            if (s.toLowerCase().startsWith(prefix.toLowerCase())) result.add(s);
+        }
+        return result;
+    }
+}
