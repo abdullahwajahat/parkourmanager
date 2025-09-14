@@ -1,49 +1,59 @@
+// File: src/main/java/com/example/parkourregion/Region.java
 package com.example.parkourregion;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.util.List;
 
 public class Region {
 
-    private final String name;
-    private final Location min;
-    private final Location max;
+    private final Location start;
+    private final Location end;
     private final List<String> blacklist;
-    private final int cooldown;
 
-    public Region(String name, Location min, Location max, List<String> blacklist, int cooldown) {
-        this.name = name;
-        this.min = min;
-        this.max = max;
+    public Region(Location start, Location end, List<String> blacklist) {
+        this.start = start;
+        this.end = end;
         this.blacklist = blacklist;
-        this.cooldown = cooldown;
     }
 
-    public String getName() {
-        return name;
+    public Location getStart() {
+        return start;
     }
 
-    public Location getMin() {
-        return min;
-    }
-
-    public Location getMax() {
-        return max;
+    public Location getEnd() {
+        return end;
     }
 
     public List<String> getBlacklist() {
         return blacklist;
     }
 
-    public int getCooldown() {
-        return cooldown;
+    public boolean contains(Location loc) {
+        return loc.getWorld().equals(start.getWorld())
+                && loc.getX() >= start.getX() && loc.getX() <= end.getX()
+                && loc.getY() >= start.getY() && loc.getY() <= end.getY()
+                && loc.getZ() >= start.getZ() && loc.getZ() <= end.getZ();
     }
 
-    public boolean contains(Location loc) {
-        if (!loc.getWorld().equals(min.getWorld())) return false;
-        return loc.getX() >= min.getX() && loc.getX() <= max.getX()
-                && loc.getY() >= min.getY() && loc.getY() <= max.getY()
-                && loc.getZ() >= min.getZ() && loc.getZ() <= max.getZ();
+    public String getStartLocationString() {
+        return locationToString(start);
+    }
+
+    public String getEndLocationString() {
+        return locationToString(end);
+    }
+
+    public static String locationToString(Location loc) {
+        return loc.getWorld().getName() + "," + loc.getX() + "," + loc.getY() + "," + loc.getZ();
+    }
+
+    public static Location stringToLocation(String s) {
+        String[] parts = s.split(",");
+        return new Location(Bukkit.getWorld(parts[0]),
+                Double.parseDouble(parts[1]),
+                Double.parseDouble(parts[2]),
+                Double.parseDouble(parts[3]));
     }
 }
