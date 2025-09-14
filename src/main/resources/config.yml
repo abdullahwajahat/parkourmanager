@@ -1,12 +1,11 @@
-# Default plugin configuration
+# ParkourRegion plugin configuration
 
 # Global defaults and settings
 blacklist-default:
   - CHEST
+
 cooldown-default: 0
 
-# Region-related defaults
-default-region-size: 5
-blacklisted-blocks:
-  - LAVA
-  - CACTUS
+# Other plugin settings
+max-checkpoints: 10
+allow-flying: false
