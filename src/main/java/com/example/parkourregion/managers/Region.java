@@ -16,6 +16,7 @@ public class Region {
     private Location finish;
     private Set<Material> blacklist = new HashSet<>();
     private Integer yLimit;
+    private Location finishTeleport;
 
     public Region(String name) { this.name = name; }
 
@@ -29,14 +30,15 @@ public class Region {
     public void setStart(Location start) { this.start = start; }
 
     public Map<Integer, Location> getCheckpoints() { return checkpoints; }
-    public void setCheckpoints(Map<Integer, Location> checkpoints) { this.checkpoints = checkpoints; }
 
     public Location getFinish() { return finish; }
     public void setFinish(Location finish) { this.finish = finish; }
 
     public Set<Material> getBlacklist() { return blacklist; }
-    public void setBlacklist(Set<Material> blacklist) { this.blacklist = blacklist; }
 
     public Integer getYLimit() { return yLimit; }
     public void setYLimit(Integer yLimit) { this.yLimit = yLimit; }
+
+    public Location getFinishTeleport() { return finishTeleport; }
+    public void setFinishTeleport(Location finishTeleport) { this.finishTeleport = finishTeleport; }
 }
