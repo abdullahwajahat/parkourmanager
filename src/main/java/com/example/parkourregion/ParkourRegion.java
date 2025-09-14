@@ -14,12 +14,12 @@ public final class ParkourRegion extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+
         saveDefaultConfig();
         saveResource("messages.yml", false);
 
-        regionManager = new RegionManager();
+        regionManager = new RegionManager(this);
 
-        // Register commands
         getCommand("por").setExecutor(new ParkourCommand());
         getCommand("por").setTabCompleter(new ParkourCommand());
         getCommand("por").setExecutor(new ParkourGUICommand());
@@ -41,4 +41,3 @@ public final class ParkourRegion extends JavaPlugin {
         return regionManager;
     }
 }
-
