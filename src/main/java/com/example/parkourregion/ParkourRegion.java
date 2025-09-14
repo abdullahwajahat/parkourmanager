@@ -1,9 +1,7 @@
 package com.example.parkourregion;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import com.example.parkourregion.managers.RegionManager;
-import com.example.parkourregion.managers.CooldownManager;
-import com.example.parkourregion.managers.SelectionManager;
+import com.example.parkourregion.managers.*;
 import com.example.parkourregion.commands.ParkourCommand;
 
 public final class ParkourRegion extends JavaPlugin {
