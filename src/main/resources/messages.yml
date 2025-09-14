@@ -1,0 +1,15 @@
+messages:
+start: "&aParkour started!"
+checkpoint:
+message: "&aCheckpoint reached!"
+sound: "BLOCK_NOTE_BLOCK_PLING"
+finish:
+messages:
+- "&aCongrats %player%, you finished!"
+- "&bWell done, %player%!"
+- "&e%player% completed the course!"
+sound: "ENTITY_PLAYER_LEVELUP"
+fail:
+enabled: true
+message: "&c&lYou Fell!"
+sound: "ENTITY_ENDERMAN_TELEPORT"
