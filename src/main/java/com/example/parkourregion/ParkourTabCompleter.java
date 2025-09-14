@@ -1,3 +1,4 @@
+// File: src/main/java/com/example/parkourregion/ParkourTabCompleter.java
 package com.example.parkourregion;
 
 import org.bukkit.command.Command;
@@ -9,20 +10,20 @@ import java.util.List;
 
 public class ParkourTabCompleter implements TabCompleter {
 
-    private final RegionManager regionManager;
+    private final ParkourRegionPlugin plugin;
 
-    public ParkourTabCompleter(RegionManager regionManager) {
-        this.regionManager = regionManager;
+    public ParkourTabCompleter(ParkourRegionPlugin plugin) {
+        this.plugin = plugin;
     }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
         if (args.length == 1) {
-            completions.add("create");
-            completions.add("delete");
-        } else if (args.length == 2 && args[0].equalsIgnoreCase("delete")) {
-            completions.addAll(regionManager.getRegions().keySet());
+            completions.addAll(plugin.getRegionManager().getRegions().keySet());
+        } else if (args.length == 2) {
+            completions.add("setstart");
+            completions.add("setend");
         }
         return completions;
     }
