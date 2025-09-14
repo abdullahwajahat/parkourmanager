@@ -17,8 +17,6 @@ public class MovementListener implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-
-        // Loop through all regions via plugin's RegionManager
         for (Region region : plugin.getRegionManager().getRegions().values()) {
             if (region.contains(player.getLocation())) {
                 for (String blk : region.getBlacklist()) {
