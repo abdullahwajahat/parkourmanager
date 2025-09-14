@@ -2,18 +2,29 @@ package com.example.parkourregion;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import com.example.parkourregion.managers.RegionManager;
+import com.example.parkourregion.managers.CooldownManager;
+import com.example.parkourregion.managers.SelectionManager;
 import com.example.parkourregion.commands.ParkourCommand;
 
 public final class ParkourRegion extends JavaPlugin {
 
     private RegionManager regionManager;
+    private CooldownManager cooldownManager;
+    private SelectionManager selectionManager;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        saveResource("messages.yml", false);
+
         this.regionManager = new RegionManager(this);
-        getCommand("por").setExecutor(new ParkourCommand(regionManager));
-        getCommand("por").setTabCompleter(new ParkourCommand(regionManager));
+        this.cooldownManager = new CooldownManager();
+        this.selectionManager = new SelectionManager();
+
+        ParkourCommand command = new ParkourCommand(this);
+        getCommand("por").setExecutor(command);
+        getCommand("por").setTabCompleter(command);
+
         getLogger().info("ParkourRegion enabled!");
     }
 
@@ -23,7 +34,7 @@ public final class ParkourRegion extends JavaPlugin {
         getLogger().info("ParkourRegion disabled!");
     }
 
-    public RegionManager getRegionManager() {
-        return regionManager;
-    }
+    public RegionManager getRegionManager() { return regionManager; }
+    public CooldownManager getCooldownManager() { return cooldownManager; }
+    public SelectionManager getSelectionManager() { return selectionManager; }
 }
