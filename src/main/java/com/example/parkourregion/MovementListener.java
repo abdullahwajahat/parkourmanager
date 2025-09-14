@@ -1,61 +1,57 @@
 package com.example.parkourregion;
-}
-// fail sound and actionbar
-if (plugin.getConfig().getBoolean("messages.fail.enabled", true)) {
-String snd = plugin.getConfig().getString("messages.fail.sound", "ENTITY_ENDERMAN_TELEPORT");
-try { p.playSound(p.getLocation(), Sound.valueOf(snd), 1f, 1f); } catch (Exception ignored) {}
-}
-String failMsg = plugin.getConfig().getString("messages.fail.message", "&c&lYou Fell!");
-p.sendActionBar(Utils.color(failMsg));
-}
 
+import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerMoveEvent;
 
-private void runFinish(Player p, Region r) {
-// show message/sound then run commands as console
-showFinishMessageAndSound(p, r);
-for (String cmd : r.getFinishCommands()) {
-String processed = cmd.replace("%player%", p.getName());
-// handle tp without world: tp player x y z -> insert world
-String[] parts = processed.split(" ");
-if (parts.length >= 4 && parts[0].equalsIgnoreCase("tp")) {
-if (parts.length == 4) {
-// tp <player> x y z -> not expected as processed has player replaced, we expect: tp Player x y z
-// Insert player's world after player
-processed = "tp " + p.getName() + " " + p.getWorld().getName() + " " + parts[1] + " " + parts[2] + " " + parts[3];
-} else if (parts.length == 5) {
-// maybe tp player world x y z -> ok
-}
-}
-Bukkit.dispatchCommand(Bukkit.getConsoleSender(), processed);
-}
-}
+import java.util.HashMap;
+import java.util.Map;
 
+public class MovementListener implements Listener {
 
-private void showFinishMessageAndSound(Player p, Region r) {
-// priority: title > subtitle > chat (we stored messageType and message)
-String type = r.getFinishMessageType();
-String msg = r.getFinishMessage();
-if (type != null && msg != null) {
-String out = Utils.color(msg.replace("%player%", p.getName()));
-if (type.equalsIgnoreCase("title")) {
-p.sendTitle(out, "", 10, 70, 20);
-} else if (type.equalsIgnoreCase("subtitle")) {
-p.sendTitle("", out, 10, 70, 20);
-} else {
-p.sendMessage(out);
-}
-} else {
-// fallback to messages.yml defaults
-List<String> fin = plugin.getConfig().getStringList("messages.finish.messages");
-if (!fin.isEmpty()) {
-String choose = fin.get((int)(Math.random()*fin.size()));
-p.sendMessage(Utils.color(choose.replace("%player%", p.getName())));
-}
-}
-String snd = r.getFinishSound();
-if (snd == null) snd = plugin.getConfig().getString("messages.finish.sound", "ENTITY_PLAYER_LEVELUP");
-if (snd != null && !snd.equalsIgnoreCase("none")) {
-try { p.playSound(p.getLocation(), Sound.valueOf(snd), 1f, 1f); } catch (Exception ignored) {}
-}
-}
+    private final ParkourRegion plugin;
+    private final Map<Player, Location> lastSafeLocation = new HashMap<>();
+
+    public MovementListener(ParkourRegion plugin) {
+        this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        Location loc = player.getLocation();
+        Region region = plugin.getRegionManager().getRegion(loc);
+        if (region == null) return;
+
+        if (region.isBlacklistedBlock(loc.getBlock().getType())) {
+            // Prevent standing
+            event.setCancelled(true);
+            return;
+        }
+
+        // Fall check
+        double fallY = region.getFallY() != null ? region.getFallY() : -64;
+        if (loc.getY() <= fallY) {
+            Location safe = lastSafeLocation.getOrDefault(player, region.getStart());
+            player.teleport(safe);
+        }
+
+        // Check checkpoints
+        for (int i = 0; i < region.getCheckpoints().size(); i++) {
+            if (loc.distance(region.getCheckpoints().get(i)) < 1.5) {
+                lastSafeLocation.put(player, region.getCheckpoints().get(i));
+                player.sendActionBar("Checkpoint " + i + " reached!");
+                player.playSound(loc, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+            }
+        }
+
+        // Finish
+        if (region.getFinish() != null && loc.distance(region.getFinish()) < 1.5) {
+            player.sendActionBar("You finished!");
+            region.getFinishCommands().forEach(cmd -> plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), cmd.replace("{player}", player.getName())));
+        }
+    }
 }
