@@ -2,15 +2,14 @@
 package com.example.parkourregion;
 
 import org.bukkit.Location;
-
 import java.util.List;
 import java.util.ArrayList;
 
 public class Region {
 
     private final String name;
-    private final Location start;
-    private final Location end;
+    private Location start;  // mutable
+    private Location end;    // mutable
     private final List<String> blacklist;
 
     public Region(String name, Location start, Location end, List<String> blacklist) {
@@ -30,6 +29,14 @@ public class Region {
 
     public Location getEnd() {
         return end;
+    }
+
+    public void setStart(Location start) {
+        this.start = start;
+    }
+
+    public void setEnd(Location end) {
+        this.end = end;
     }
 
     public List<String> getBlacklist() {
