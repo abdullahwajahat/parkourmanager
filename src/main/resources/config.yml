@@ -1,11 +1,6 @@
-# ParkourRegion plugin configuration
-
-# Global defaults and settings
+# File: config.yml
 blacklist-default:
-  - CHEST
-
+- CHEST
 cooldown-default: 0
 
-# Other plugin settings
-max-checkpoints: 10
-allow-flying: false
+regions: {}
