@@ -98,7 +98,7 @@ public class RegionManager {
             region.getBlacklist().addAll(blacklist);
 
             // Load cooldown
-            region.setCooldown(plugin.getConfig().getInt(path + ".cooldown", 0));
+            region.setCooldown(plugin.getConfig().getInt(path + ".cooldown", String.valueOf(0)));
 
             // Load fallY
             region.setFallY(plugin.getConfig().getDouble(path + ".fallY", Double.MIN_VALUE));
