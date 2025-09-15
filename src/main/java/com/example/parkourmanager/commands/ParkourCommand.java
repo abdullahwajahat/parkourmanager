@@ -1,9 +1,11 @@
-package com.example.parkourmanager;
 package com.example.parkourmanager.commands;
 
+import com.example.parkourmanager.ParkourManager;
+import com.example.parkourmanager.utils.MessageUtil;
+import com.example.parkourmanager.managers.RegionManager;
+import com.example.parkourmanager.models.Region;
+
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,6 +14,9 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ParkourCommand implements CommandExecutor, TabCompleter {
