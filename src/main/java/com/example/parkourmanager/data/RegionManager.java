@@ -116,7 +116,7 @@ public class RegionManager {
         }
     }
 
-    public void setFallY(String regionName, int y) {
+    public void setFallY(String regionName, double y) {
         Region region = getRegion(regionName);
         if (region != null) {
             region.setFallY(y);
@@ -165,7 +165,7 @@ public class RegionManager {
     public String getRegionAt(Location loc) {
         for (Region region : regions.values()) {
             if (region.isInside(loc)) {
-                return region.getName();
+                return region;
             }
         }
         return null;
