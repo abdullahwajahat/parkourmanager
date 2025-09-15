@@ -6,6 +6,8 @@ import com.example.parkourmanager.data.RegionManager;
 import com.example.parkourmanager.data.Region;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
