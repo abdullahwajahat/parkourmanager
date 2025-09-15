@@ -1,12 +1,16 @@
-name: ParkourRegion
-version: 2.0
-main: com.example.parkourregion.ParkourRegion
+name: ParkourManager
+main: com.example.parkourmanager.ParkourManager
+version: 1.0.0
 api-version: 1.21
-permissions:
-  parkourregion.admin:
-    description: Allows managing parkour regions
-    default: op
+authors: [ "YourName" ]
+description: Parkour Manager plugin with regions, checkpoints, blacklist blocks, cooldowns, and more.
 commands:
-  por:
-    description: Main parkour command
-    usage: /<command> <args>
+  parkourmanager:
+    description: Main Parkour Manager command
+    aliases: [pm]
+    usage: /<command>
+    permission: parkourmanager.use
+permissions:
+  parkourmanager.use:
+    description: Allows use of Parkour Manager commands
+    default: op
