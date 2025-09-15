@@ -10,6 +10,7 @@ public class ParkourManager extends JavaPlugin {
 
     private static ParkourManager instance;
     private RegionManager regionManager;
+    private SelectionManager selectionManager;
 
     @Override
     public void onEnable() {
@@ -19,6 +20,7 @@ public class ParkourManager extends JavaPlugin {
 
         MessageUtil.load(this);
         this.regionManager = new RegionManager(this);
+        this.selectionManager = new SelectionManager();
 
         getCommand("parkourmanager").setExecutor(new ParkourCommand(this));
         getCommand("parkourmanager").setTabCompleter(new ParkourCommand(this));
@@ -40,5 +42,8 @@ public class ParkourManager extends JavaPlugin {
 
     public RegionManager getRegionManager() {
         return regionManager;
+    }
+    public SelectionManager getSelectionManager() {
+        return selectionManager;
     }
 }
