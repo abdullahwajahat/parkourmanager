@@ -162,7 +162,7 @@ public class RegionManager {
         return new Location(region.getPos1().getWorld(), midX, midY, midZ);
     }
 
-    public String getRegionAt(Location loc) {
+    public Region getRegionAt(Location loc) {
         for (Region region : regions.values()) {
             if (region.isInside(loc)) {
                 return region;
@@ -170,6 +170,7 @@ public class RegionManager {
         }
         return null;
     }
+
 
     public void showRegionOutline(String regionName, Player player, Particle particle) {
         Region region = getRegion(regionName);
