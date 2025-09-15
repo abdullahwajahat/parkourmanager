@@ -2,6 +2,7 @@ package com.example.parkourmanager;
 
 import com.example.parkourmanager.commands.ParkourCommand;
 import com.example.parkourmanager.data.RegionManager;
+import com.example.parkourmanager.data.SelectionManager;
 import com.example.parkourmanager.listeners.PlayerListener;
 import com.example.parkourmanager.utils.MessageUtil;
 import org.bukkit.plugin.java.JavaPlugin;
