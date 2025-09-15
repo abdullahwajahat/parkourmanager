@@ -2,8 +2,8 @@ package com.example.parkourmanager.commands;
 
 import com.example.parkourmanager.ParkourManager;
 import com.example.parkourmanager.utils.MessageUtil;
-import com.example.parkourmanager.managers.RegionManager;
-import com.example.parkourmanager.models.Region;
+import com.example.parkourmanager.data.RegionManager;
+import com.example.parkourmanager.data.Region;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
