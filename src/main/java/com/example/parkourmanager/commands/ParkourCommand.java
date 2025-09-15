@@ -245,7 +245,7 @@ public class ParkourCommand implements CommandExecutor, TabCompleter {
             MessageUtil.send(player, "no-region-info");
             return;
         }
-        plugin.getRegionManager().showRegionOutline(regionName, player, Particle.VILLAGER_HAPPY);
+        plugin.getRegionManager().showRegionOutline(regionName, player, Particle.HAPPY_VILLAGER);
         String info = plugin.getRegionManager().getRegionInfo(regionName);
         MessageUtil.send(player, "region-info", Map.of("info", info));
     }
