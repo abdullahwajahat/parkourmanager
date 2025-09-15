@@ -19,4 +19,29 @@ public class MessageUtil {
         return ChatColor.translateAlternateColorCodes('&',
                 messages.getString("prefix", "") + messages.getString(path, path));
     }
+    
+    // Send to any command sender
+    public static void send(CommandSender sender, String message) {
+        if (sender != null && message != null) {
+            sender.sendMessage(message);
+        }
+    }
+
+    // Send to player with placeholders
+    public static void send(Player player, String message, Map<String, String> placeholders) {
+        if (player != null && message != null) {
+            String processed = message;
+            if (placeholders != null) {
+                for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                    processed = processed.replace("%" + entry.getKey() + "%", entry.getValue());
+                }
+            }
+            player.sendMessage(processed);
+        }
+    }
+
+    // Send to player without placeholders
+    public static void send(Player player, String message) {
+        send((CommandSender) player, message);
+    }
 }
