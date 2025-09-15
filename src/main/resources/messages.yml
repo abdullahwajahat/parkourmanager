@@ -1,19 +1,71 @@
-prefix: "&7[&aParkourManager&7] "
+# ==========================
+# Parkour Manager - Messages
+# ==========================
+# Use & for color codes, supports bold (&l), italic (&o), etc.
 
-no-permission: "&cYou don't have permission!"
-need-positions: "&c&lYou need to set positions first!"
+prefix: "&7[&bParkourManager&7] "
+
+no-permission: "&cYou do not have permission to use this command!"
+player-only: "&cThis command can only be used by players!"
+region-not-found: "&cRegion &e%region% &cwas not found!"
+not-in-region: "&cYou are not standing inside a region!"
+invalid-args: "&cInvalid arguments! Use &e/pm help"
+
+# ======= Region Selection =======
+pos1-set: "&aFirst position set at &e%x%, %y%, %z%"
+pos2-set: "&aSecond position set at &e%x%, %y%, %z%"
+pos-not-set: "&cYou need to set both positions first!"
+
+# ======= Region Creation =======
 region-created: "&aRegion &e%region% &ahas been created!"
 region-deleted: "&cRegion &e%region% &chas been deleted!"
-region-exists: "&cRegion with this name already exists!"
-no-region: "&cNo region found with that name!"
-set-start: "&aStart point set for region!"
-set-finish: "&aFinish point set for region!"
-checkpoint-added: "&aCheckpoint %number% added!"
-checkpoint-removed: "&cCheckpoint %number% removed!"
-blacklist-added: "&cBlock %block% added to blacklist!"
-blacklist-removed: "&aBlock %block% removed from blacklist!"
-cooldown-set: "&eCooldown set for region %region%: %time%"
-fallY-set: "&eFallY set for region %region%: %y%"
-teleport: "&aTeleported to region %region%"
-info-title: "&6Region Info: &e%region%"
-confirmation: "&cAre you sure? Type /pm deleteconfirm %region%"
+region-delete-confirm: "&cAre you sure you want to delete &e%region%&c? Run the command again to confirm."
+
+# ======= Start / Finish =======
+start-set: "&aStart point set for region &e%region%"
+finish-set: "&aFinish point set for region &e%region%"
+start-finish-required: "&cYou must set both a start and finish point!"
+
+# ======= Checkpoints =======
+checkpoint-added: "&aCheckpoint &e%number% &aset at &e%x%, %y%, %z%"
+checkpoint-removed: "&cCheckpoint &e%number% &cremoved from region &e%region%"
+checkpoint-edited: "&aCheckpoint &e%number% &aupdated at &e%x%, %y%, %z%"
+
+# ======= Finish Commands =======
+finishcommand-added: "&aAdded finish command to region &e%region%: &f%command%"
+finishcommand-removed: "&cRemoved finish command &e%number% &cfrom region &e%region%"
+finishcommand-set: "&aFinish command &e%number% &aupdated to: &f%command%"
+no-finishcommands: "&cNo finish commands set for this region."
+
+# ======= Blacklist =======
+blacklist-added: "&cBlock &e%block% &chas been blacklisted in region &e%region%"
+blacklist-removed: "&aBlock &e%block% &ahas been removed from blacklist in region &e%region%"
+blacklist-deny: "&cYou cannot stand on a &e%block% &cinside region &e%region%!"
+
+# ======= Fall Y =======
+fallY-set: "&aFall Y for region &e%region% &aset to &e%y%"
+
+# ======= Cooldown =======
+cooldown-set: "&aCooldown for region &e%region% &aset to &e%time%"
+cooldown-active: "&cYou must wait &e%time% &cbefore attempting this parkour again!"
+
+# ======= Info / List =======
+region-info: "&bRegion: &e%region% &7| &bWorld: &e%world%"
+region-info-start: "&7- &aStart: &e%start%"
+region-info-finish: "&7- &aFinish: &e%finish%"
+region-info-checkpoints: "&7- &aCheckpoints: &e%checkpoints%"
+region-info-blacklist: "&7- &cBlacklist: &e%blacklist%"
+region-info-cooldown: "&7- &aCooldown: &e%cooldown%"
+region-info-fallY: "&7- &aFall Y: &e%fallY%"
+region-list-header: "&bRegions: "
+region-list-entry: "&7- &e%region%"
+
+# ======= Teleport =======
+region-teleport: "&aTeleported to region &e%region%"
+checkpoint-teleport: "&aTeleported to checkpoint &e%number%"
+start-teleport: "&aTeleported to start of region &e%region%"
+
+# ======= Parkour Progress =======
+progress-reset: "&cYour progress in region &e%region% &chas been reset!"
+checkpoint-reached: "&aYou reached checkpoint &e%number%!"
+parkour-completed: "&aYou completed the parkour in region &e%region%!"
