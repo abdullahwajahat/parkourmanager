@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 
 public class ParkourCommand implements CommandExecutor, TabCompleter {
 
-    private final ParkourManager plugin;
+    private final ParkourManagerPlugin plugin;
 
-    public ParkourCommand(ParkourManager plugin) {
+    public ParkourCommand(ParkourManagerPlugin plugin) {
         this.plugin = plugin;
     }
 
