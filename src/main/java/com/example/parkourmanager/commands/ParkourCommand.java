@@ -235,18 +235,18 @@ public class ParkourCommand implements CommandExecutor, TabCompleter {
     }
 
     private void handleInfo(Player player, String[] args) {
-        String regionName;
+        Region region;
         if (args.length >= 2) {
-            regionName = args[1];
+            region = plugin.getRegionManager().getRegion(args[1]);
         } else {
-            regionName = plugin.getRegionManager().getRegionAt(player.getLocation());
+            region = plugin.getRegionManager().getRegionAt(player.getLocation());
         }
-        if (regionName == null) {
+        if (region == null) {
             MessageUtil.send(player, "no-region-info");
             return;
         }
-        plugin.getRegionManager().showRegionOutline(regionName, player, Particle.HAPPY_VILLAGER);
-        String info = plugin.getRegionManager().getRegionInfo(regionName);
+        plugin.getRegionManager().showRegionOutline(region.getName(), player, Particle.HAPPY_VILLAGER);
+        String info = plugin.getRegionManager().getRegionInfo(region.getName());
         MessageUtil.send(player, "region-info", Map.of("info", info));
     }
 
