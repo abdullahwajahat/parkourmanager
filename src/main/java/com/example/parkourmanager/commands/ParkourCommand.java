@@ -31,6 +31,7 @@ public class ParkourCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        this.selectionManager = new SelectionManager();
         if (!(sender instanceof Player player)) {
             MessageUtil.send(sender, "player-only");
             return true;
