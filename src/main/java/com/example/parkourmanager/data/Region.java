@@ -13,7 +13,7 @@ public class Region {
     private final List<String> finishCommands = new ArrayList<>();
     private final List<String> blacklist = new ArrayList<>();
     private double fallY = Double.MIN_VALUE;
-    private String cooldown = "0s";
+    private int cooldown = 0; // changed from String "0s" → int 0
 
     public Region(String name) {
         this.name = name;
@@ -33,8 +33,10 @@ public class Region {
     public List<String> getBlacklist() { return blacklist; }
     public double getFallY() { return fallY; }
     public void setFallY(double fallY) { this.fallY = fallY; }
-    public String getCooldown() { return cooldown; }
-    public void setCooldown(String cooldown) { this.cooldown = cooldown; }
+
+    // cooldown now int
+    public int getCooldown() { return cooldown; }
+    public void setCooldown(int cooldown) { this.cooldown = cooldown; }
 
     public boolean isInside(Location loc) {
         if (pos1 == null || pos2 == null) return false;
