@@ -1,71 +1,151 @@
 package com.example.parkourmanager.data;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Region {
-    private String name;
+
+    private final String id;
     private Location pos1;
     private Location pos2;
     private Location start;
     private Location finish;
-    private final Map<Integer, Location> checkpoints = new HashMap<>();
-    private final List<String> finishCommands = new ArrayList<>();
-    private final Set<String> blacklistBlocks = new HashSet<>();
-    private double fallY = Double.NaN;
+    private final List<Location> checkpoints = new ArrayList<>();
 
-    public Region(String name, Location pos1, Location pos2) {
-        this.name = name;
+    private final List<String> finishCommands = new ArrayList<>();
+    private final List<Material> blacklistBlocks = new ArrayList<>();
+
+    private int fallY = -64;
+    private int cooldown = 0;
+
+    public Region(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setPos1(Location pos1) {
         this.pos1 = pos1;
+    }
+
+    public void setPos2(Location pos2) {
         this.pos2 = pos2;
     }
 
-    public String getName() { return name; }
-    public Location getStart() { return start; }
-    public Location getFinish() { return finish; }
-    public void setStart(Location loc) { this.start = loc; }
-    public void setFinish(Location loc) { this.finish = loc; }
-    public Map<Integer, Location> getCheckpoints() { return checkpoints; }
-
-    // 🔹 Get checkpoint
-    public Location getCheckpoint(int number) {
-        return checkpoints.get(number);
+    public Location getPos1() {
+        return pos1;
     }
 
-    // 🔹 Check if location is inside region
+    public Location getPos2() {
+        return pos2;
+    }
+
+    public void setStart(Location start) {
+        this.start = start;
+    }
+
+    public Location getStart() {
+        return start;
+    }
+
+    public void setFinish(Location finish) {
+        this.finish = finish;
+    }
+
+    public Location getFinish() {
+        return finish;
+    }
+
+    public void addCheckpoint(Location loc) {
+        checkpoints.add(loc);
+    }
+
+    public Location getCheckpoint(int index) {
+        if (index >= 0 && index < checkpoints.size()) {
+            return checkpoints.get(index);
+        }
+        return null;
+    }
+
+    public List<Location> getCheckpoints() {
+        return checkpoints;
+    }
+
+    // ============= Fixes for your errors =============
+
+    public List<String> getFinishCommands() {
+        return finishCommands;
+    }
+
+    public void addFinishCommand(String command) {
+        finishCommands.add(command);
+    }
+
+    public int getFallY() {
+        return fallY;
+    }
+
+    public void setFallY(int fallY) {
+        this.fallY = fallY;
+    }
+
+    public List<Material> getBlacklist() {
+        return blacklistBlocks;
+    }
+
+    public void addBlacklistBlock(Material material) {
+        blacklistBlocks.add(material);
+    }
+
+    public int getCooldown() {
+        return cooldown;
+    }
+
+    public void setCooldown(int cooldown) {
+        this.cooldown = cooldown;
+    }
+
+    // Check if a location is inside region
     public boolean isInside(Location loc) {
-        if (pos1 == null || pos2 == null || loc == null || !loc.getWorld().equals(pos1.getWorld())) return false;
+        if (pos1 == null || pos2 == null || !pos1.getWorld().equals(loc.getWorld())) return false;
 
         double x1 = Math.min(pos1.getX(), pos2.getX());
-        double x2 = Math.max(pos1.getX(), pos2.getX());
         double y1 = Math.min(pos1.getY(), pos2.getY());
-        double y2 = Math.max(pos1.getY(), pos2.getY());
         double z1 = Math.min(pos1.getZ(), pos2.getZ());
+
+        double x2 = Math.max(pos1.getX(), pos2.getX());
+        double y2 = Math.max(pos1.getY(), pos2.getY());
         double z2 = Math.max(pos1.getZ(), pos2.getZ());
 
-        double x = loc.getX();
-        double y = loc.getY();
-        double z = loc.getZ();
-
-        return (x >= x1 && x <= x2) &&
-               (y >= y1 && y <= y2) &&
-               (z >= z1 && z <= z2);
+        return loc.getX() >= x1 && loc.getX() <= x2
+                && loc.getY() >= y1 && loc.getY() <= y2
+                && loc.getZ() >= z1 && loc.getZ() <= z2;
     }
 
-    // 🔹 Info string for /pm info
+    // Used in debug/info commands
     public String toInfoString() {
-        return "&aRegion: &f" + name +
-               " &aStart: &f" + (start != null ? start.toVector().toString() : "none") +
-               " &aFinish: &f" + (finish != null ? finish.toVector().toString() : "none") +
-               " &aCheckpoints: &f" + checkpoints.size() +
-               " &aBlacklist: &f" + blacklistBlocks.size();
+        return "Region{" +
+                "id='" + id + '\'' +
+                ", pos1=" + (pos1 != null ? pos1.toVector() : "null") +
+                ", pos2=" + (pos2 != null ? pos2.toVector() : "null") +
+                ", start=" + (start != null ? start.toVector() : "null") +
+                ", finish=" + (finish != null ? finish.toVector() : "null") +
+                ", checkpoints=" + checkpoints.size() +
+                ", fallY=" + fallY +
+                ", cooldown=" + cooldown +
+                '}';
     }
 
-    // 🔹 Show particle outline
+    // Outline with particles
     public void spawnOutline(Particle particle, Player player) {
         if (pos1 == null || pos2 == null) return;
 
@@ -76,52 +156,57 @@ public class Region {
         double minZ = Math.min(pos1.getZ(), pos2.getZ());
         double maxZ = Math.max(pos1.getZ(), pos2.getZ());
 
-        for (double x = minX; x <= maxX; x++) {
-            for (double y = minY; y <= maxY; y++) {
+        for (double x = minX; x <= maxX; x += 1.0) {
+            for (double y = minY; y <= maxY; y += 1.0) {
                 player.spawnParticle(particle, new Location(pos1.getWorld(), x, y, minZ), 1);
                 player.spawnParticle(particle, new Location(pos1.getWorld(), x, y, maxZ), 1);
             }
         }
-        for (double z = minZ; z <= maxZ; z++) {
-            for (double y = minY; y <= maxY; y++) {
+        for (double z = minZ; z <= maxZ; z += 1.0) {
+            for (double y = minY; y <= maxY; y += 1.0) {
                 player.spawnParticle(particle, new Location(pos1.getWorld(), minX, y, z), 1);
                 player.spawnParticle(particle, new Location(pos1.getWorld(), maxX, y, z), 1);
             }
         }
     }
 
-    // 🔹 Save region data to config
+    // Save to config
     public void saveToConfig(ConfigurationSection section) {
         section.set("pos1", pos1);
         section.set("pos2", pos2);
         section.set("start", start);
         section.set("finish", finish);
-        section.set("fallY", fallY);
-        section.set("blacklist", new ArrayList<>(blacklistBlocks));
+        section.set("checkpoints", checkpoints);
         section.set("finishCommands", finishCommands);
+        section.set("fallY", fallY);
+        section.set("cooldown", cooldown);
 
-        ConfigurationSection cpSec = section.createSection("checkpoints");
-        for (Map.Entry<Integer, Location> entry : checkpoints.entrySet()) {
-            cpSec.set(String.valueOf(entry.getKey()), entry.getValue());
+        List<String> blacklistNames = new ArrayList<>();
+        for (Material m : blacklistBlocks) {
+            blacklistNames.add(m.name());
         }
+        section.set("blacklist", blacklistNames);
     }
 
-    // 🔹 Load region data from config
-    public static Region loadFromConfig(String name, ConfigurationSection section) {
-        Location pos1 = (Location) section.get("pos1");
-        Location pos2 = (Location) section.get("pos2");
-        Region region = new Region(name, pos1, pos2);
-
+    // Load from config
+    public static Region loadFromConfig(String id, ConfigurationSection section) {
+        Region region = new Region(id);
+        region.pos1 = (Location) section.get("pos1");
+        region.pos2 = (Location) section.get("pos2");
         region.start = (Location) section.get("start");
         region.finish = (Location) section.get("finish");
-        region.fallY = section.getDouble("fallY", Double.NaN);
-        region.blacklistBlocks.addAll(section.getStringList("blacklist"));
+
+        region.checkpoints.addAll((List<Location>) section.getList("checkpoints", new ArrayList<>()));
         region.finishCommands.addAll(section.getStringList("finishCommands"));
 
-        ConfigurationSection cpSec = section.getConfigurationSection("checkpoints");
-        if (cpSec != null) {
-            for (String key : cpSec.getKeys(false)) {
-                region.checkpoints.put(Integer.parseInt(key), (Location) cpSec.get(key));
+        region.fallY = section.getInt("fallY", -64);
+        region.cooldown = section.getInt("cooldown", 0);
+
+        List<String> blacklistNames = section.getStringList("blacklist");
+        for (String name : blacklistNames) {
+            Material mat = Material.matchMaterial(name);
+            if (mat != null) {
+                region.blacklistBlocks.add(mat);
             }
         }
 
