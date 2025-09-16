@@ -1,1 +1,16 @@
+# ========================
+# Parkour Manager Config
+# ========================
+
+# General plugin settings
+settings:
+  debug: false   # Enable extra console logging
+  outline-particle: VILLAGER_HAPPY  # Default particle for region outline
+  outline-duration: 10              # Seconds region outlines last when shown
+
+# Default cooldown (applies if none set per region)
+default-cooldown: "0s"
+
+# Regions will be saved here automatically.
+# Do NOT edit manually unless you know what you're doing.
 regions: {}
