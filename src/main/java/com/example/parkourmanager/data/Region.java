@@ -28,98 +28,65 @@ public class Region {
         this.fallY = null;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
+    public Location getPos1() { return pos1; }
+    public Location getPos2() { return pos2; }
+    public void setPos1(Location pos1) { this.pos1 = pos1; }
+    public void setPos2(Location pos2) { this.pos2 = pos2; }
 
-    public Location getPos1() {
-        return pos1;
-    }
+    public Location getStart() { return start; }
+    public void setStart(Location start) { this.start = start; }
 
-    public Location getPos2() {
-        return pos2;
-    }
+    public Location getFinish() { return finish; }
+    public void setFinish(Location finish) { this.finish = finish; }
 
-    public void setPos1(Location pos1) {
-        this.pos1 = pos1;
-    }
+    // ✅ checkpoints
+    public void addCheckpoint(int number, Location loc) { checkpoints.put(number, loc); }
+    public void removeCheckpoint(int number) { checkpoints.remove(number); }
+    public Location getCheckpoint(int number) { return checkpoints.get(number); }
+    public Map<Integer, Location> getCheckpoints() { return checkpoints; }
 
-    public void setPos2(Location pos2) {
-        this.pos2 = pos2;
-    }
-
-    public Location getStart() {
-        return start;
-    }
-
-    public void setStart(Location start) {
-        this.start = start;
-    }
-
-    public Location getFinish() {
-        return finish;
-    }
-
-    public void setFinish(Location finish) {
-        this.finish = finish;
-    }
-
-    public void addCheckpoint(int number, Location loc) {
+    // alias for RegionManager compatibility
+    public void setCheckpoint(int number, Location loc) {
         checkpoints.put(number, loc);
     }
 
-    public void removeCheckpoint(int number) {
-        checkpoints.remove(number);
+    // ✅ blacklist
+    public void addBlacklist(Material material) { blacklist.add(material); }
+    public void removeBlacklist(Material material) { blacklist.remove(material); }
+    public Set<Material> getBlacklist() { return blacklist; }
+
+    // alias for RegionManager compatibility
+    public void addBlacklistBlock(Material material) {
+        addBlacklist(material);
     }
 
-    public Location getCheckpoint(int number) {
-        return checkpoints.get(number);
+    public void setBlacklistBlocks(List<Material> blocks) {
+        blacklist.clear();
+        blacklist.addAll(blocks);
     }
 
-    public Map<Integer, Location> getCheckpoints() {
-        return checkpoints;
-    }
-
-    public void addBlacklist(Material material) {
-        blacklist.add(material);
-    }
-
-    public void removeBlacklist(Material material) {
-        blacklist.remove(material);
-    }
-
-    public Set<Material> getBlacklist() {
-        return blacklist;
-    }
-
-    public void addFinishCommand(String command) {
-        finishCommands.add(command);
-    }
-
+    // ✅ finish commands
+    public void addFinishCommand(String command) { finishCommands.add(command); }
     public void removeFinishCommand(int index) {
-        if (index >= 0 && index < finishCommands.size()) {
-            finishCommands.remove(index);
-        }
+        if (index >= 0 && index < finishCommands.size()) finishCommands.remove(index);
     }
-
     public void setFinishCommand(int index, String command) {
-        if (index >= 0 && index < finishCommands.size()) {
-            finishCommands.set(index, command);
-        }
+        if (index >= 0 && index < finishCommands.size()) finishCommands.set(index, command);
+    }
+    public List<String> getFinishCommands() { return finishCommands; }
+
+    // alias for RegionManager compatibility
+    public void setFinishCommands(List<String> commands) {
+        finishCommands.clear();
+        finishCommands.addAll(commands);
     }
 
-    public List<String> getFinishCommands() {
-        return finishCommands;
-    }
+    // ✅ fallY
+    public Integer getFallY() { return fallY; }
+    public void setFallY(Integer fallY) { this.fallY = fallY; }
 
-    public Integer getFallY() {
-        return fallY;
-    }
-
-    public void setFallY(Integer fallY) {
-        this.fallY = fallY;
-    }
-
+    // ✅ particle outline
     public void spawnOutline(Particle particle, Player player) {
         if (pos1 == null || pos2 == null) return;
 
@@ -152,6 +119,7 @@ public class Region {
         }
     }
 
+    // ✅ region containment check
     public boolean contains(Location loc) {
         if (pos1 == null || pos2 == null || loc == null) return false;
 
@@ -165,5 +133,10 @@ public class Region {
         return loc.getBlockX() >= minX && loc.getBlockX() <= maxX &&
                loc.getBlockY() >= minY && loc.getBlockY() <= maxY &&
                loc.getBlockZ() >= minZ && loc.getBlockZ() <= maxZ;
+    }
+
+    // ✅ alias for finish region (compatibility)
+    public Location getFinishRegion() {
+        return getFinish();
     }
 }
