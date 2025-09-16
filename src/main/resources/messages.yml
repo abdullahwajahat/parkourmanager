@@ -1,71 +1,69 @@
-# ==========================
-# Parkour Manager - Messages
-# ==========================
-# Use & for color codes, supports bold (&l), italic (&o), etc.
+# ========================
+# Parkour Manager Messages
+# ========================
+# Placeholders: {region}, {cmd}, {num}, {x}, {y}, {z}, {time}, {block}, {index}, {info}, {usage}, {list}, {action}
+# Colors supported with '&'
 
-prefix: "&7[&bParkourManager&7] "
+prefix: "&7[&aParkourManager&7] "
 
-no-permission: "&cYou do not have permission to use this command!"
-player-only: "&cThis command can only be used by players!"
-region-not-found: "&cRegion &e%region% &cwas not found!"
-not-in-region: "&cYou are not standing inside a region!"
-invalid-args: "&cInvalid arguments! Use &e/pm help"
+# General
+player-only: "{prefix}&cThis command can only be run by players!"
+invalid-usage: "{prefix}&cInvalid usage. Correct: {usage}"
+unknown-command: "{prefix}&cUnknown command: &e{cmd}"
+no-permission: "{prefix}&cYou don’t have permission to do that!"
+no-region-info: "{prefix}&cNo region found here."
 
-# ======= Region Selection =======
-pos1-set: "&aFirst position set at &e%x%, %y%, %z%"
-pos2-set: "&aSecond position set at &e%x%, %y%, %z%"
-pos-not-set: "&cYou need to set both positions first!"
+# Selection
+pos1-set: "{prefix}&aPosition 1 set at &eX:{x} Y:{y} Z:{z}"
+pos2-set: "{prefix}&aPosition 2 set at &eX:{x} Y:{y} Z:{z}"
+need-selection: "{prefix}&cYou must select both positions first!"
 
-# ======= Region Creation =======
-region-created: "&aRegion &e%region% &ahas been created!"
-region-deleted: "&cRegion &e%region% &chas been deleted!"
-region-delete-confirm: "&cAre you sure you want to delete &e%region%&c? Run the command again to confirm."
+# Region
+create-usage: "{prefix}&cUsage: /pm create <region>"
+region-created: "{prefix}&aRegion &e{region}&a created successfully!"
+region-deleted: "{prefix}&cRegion &e{region}&c deleted!"
+region-list: "{prefix}&aRegions: &e{list}"
+region-info: "{prefix}&aRegion info: &f{info}"
+region-unknown-action: "{prefix}&cUnknown region action: &e{action}"
 
-# ======= Start / Finish =======
-start-set: "&aStart point set for region &e%region%"
-finish-set: "&aFinish point set for region &e%region%"
-start-finish-required: "&cYou must set both a start and finish point!"
+# Start/Finish
+start-set: "{prefix}&aStart point set!"
+finish-set: "{prefix}&aFinish point set!"
 
-# ======= Checkpoints =======
-checkpoint-added: "&aCheckpoint &e%number% &aset at &e%x%, %y%, %z%"
-checkpoint-removed: "&cCheckpoint &e%number% &cremoved from region &e%region%"
-checkpoint-edited: "&aCheckpoint &e%number% &aupdated at &e%x%, %y%, %z%"
+# Checkpoints
+checkpoint-usage: "{prefix}&cUsage: /pm addcheckpoint <number>"
+checkpoint-added: "{prefix}&aCheckpoint &e{num}&a added!"
+checkpoint-edited: "{prefix}&aCheckpoint &e{num}&a updated!"
+checkpoint-remove-usage: "{prefix}&cUsage: /pm region <region> removecheckpoint <num>"
+checkpoint-removed: "{prefix}&cCheckpoint &e{num}&c removed!"
 
-# ======= Finish Commands =======
-finishcommand-added: "&aAdded finish command to region &e%region%: &f%command%"
-finishcommand-removed: "&cRemoved finish command &e%number% &cfrom region &e%region%"
-finishcommand-set: "&aFinish command &e%number% &aupdated to: &f%command%"
-no-finishcommands: "&cNo finish commands set for this region."
+# Finish commands
+addfinishcommand-usage: "{prefix}&cUsage: /pm region <region> addfinishcommand <command>"
+finishcommand-added: "{prefix}&aFinish command added: &e{cmd}"
+removefinishcommand-usage: "{prefix}&cUsage: /pm region <region> removefinishcommand <index>"
+finishcommand-removed: "{prefix}&cFinish command &e{index}&c removed!"
+setfinishcommand-usage: "{prefix}&cUsage: /pm region <region> setfinishcommand <index> <command>"
+finishcommand-set: "{prefix}&aFinish command &e{index}&a updated to: &e{cmd}"
 
-# ======= Blacklist =======
-blacklist-added: "&cBlock &e%block% &chas been blacklisted in region &e%region%"
-blacklist-removed: "&aBlock &e%block% &ahas been removed from blacklist in region &e%region%"
-blacklist-deny: "&cYou cannot stand on a &e%block% &cinside region &e%region%!"
+# Fall Y
+setfally-usage: "{prefix}&cUsage: /pm region <region> setfally <y>"
+fally-set: "{prefix}&aFall Y set to &e{y}"
 
-# ======= Fall Y =======
-fallY-set: "&aFall Y for region &e%region% &aset to &e%y%"
+# Cooldown
+cooldown-usage: "{prefix}&cUsage: /pm region <region> cooldown <time>"
+cooldown-set: "{prefix}&aCooldown set to &e{time}"
 
-# ======= Cooldown =======
-cooldown-set: "&aCooldown for region &e%region% &aset to &e%time%"
-cooldown-active: "&cYou must wait &e%time% &cbefore attempting this parkour again!"
+# Block blacklist
+addblacklist-usage: "{prefix}&cUsage: /pm region <region> addblacklist <block>"
+blacklist-added: "{prefix}&aBlock added to blacklist: &e{block}"
+removeblacklist-usage: "{prefix}&cUsage: /pm region <region> removeblacklist <block>"
+blacklist-removed: "{prefix}&cBlock removed from blacklist: &e{block}"
+invalid-block: "{prefix}&cInvalid block: &e{block}"
 
-# ======= Info / List =======
-region-info: "&bRegion: &e%region% &7| &bWorld: &e%world%"
-region-info-start: "&7- &aStart: &e%start%"
-region-info-finish: "&7- &aFinish: &e%finish%"
-region-info-checkpoints: "&7- &aCheckpoints: &e%checkpoints%"
-region-info-blacklist: "&7- &cBlacklist: &e%blacklist%"
-region-info-cooldown: "&7- &aCooldown: &e%cooldown%"
-region-info-fallY: "&7- &aFall Y: &e%fallY%"
-region-list-header: "&bRegions: "
-region-list-entry: "&7- &e%region%"
+# Teleport
+region-tp: "{prefix}&aTeleported to region &e{region}"
 
-# ======= Teleport =======
-region-teleport: "&aTeleported to region &e%region%"
-checkpoint-teleport: "&aTeleported to checkpoint &e%number%"
-start-teleport: "&aTeleported to start of region &e%region%"
-
-# ======= Parkour Progress =======
-progress-reset: "&cYour progress in region &e%region% &chas been reset!"
-checkpoint-reached: "&aYou reached checkpoint &e%number%!"
-parkour-completed: "&aYou completed the parkour in region &e%region%!"
+# Help
+help-header: "&7&m--------&r &aParkour Manager Help &7&m--------"
+help-command: "&e{usage} &7- &f{desc}"
+help-footer: "&7&m---------------------------------------"
