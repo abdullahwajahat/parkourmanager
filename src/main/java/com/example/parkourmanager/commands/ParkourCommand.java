@@ -1,11 +1,8 @@
 package com.example.parkourmanager.commands;
 
 import com.example.parkourmanager.ParkourManager;
-import com.example.parkourmanager.utils.MessageUtil;
-import com.example.parkourmanager.data.RegionManager;
 import com.example.parkourmanager.data.Region;
-import com.example.parkourmanager.data.SelectionManager;
-
+import com.example.parkourmanager.utils.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,10 +14,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ParkourCommand implements CommandExecutor, TabCompleter {
 
@@ -51,8 +44,8 @@ public class ParkourCommand implements CommandExecutor, TabCompleter {
             case "setstart" -> handleSetStart(player, args);
             case "setfinish" -> handleSetFinish(player, args);
             case "addcheckpoint" -> handleAddCheckpoint(player, args);
-            case "region" -> handleRegion(player, args);
             case "editcheckpoint" -> handleEditCheckpoint(player, args);
+            case "region" -> handleRegion(player, args);
             case "list" -> handleList(player);
             case "info" -> handleInfo(player, args);
             case "delete" -> handleDelete(player, args);
@@ -67,21 +60,13 @@ public class ParkourCommand implements CommandExecutor, TabCompleter {
     private void handlePos1(Player player) {
         Location loc = player.getLocation();
         plugin.getSelectionManager().setPos1(player, loc);
-        MessageUtil.send(player, "pos1-set", Map.of(
-                "x", String.valueOf(loc.getBlockX()),
-                "y", String.valueOf(loc.getBlockY()),
-                "z", String.valueOf(loc.getBlockZ())
-        ));
+        MessageUtil.send(player, "pos1-set", coords(loc));
     }
 
     private void handlePos2(Player player) {
         Location loc = player.getLocation();
         plugin.getSelectionManager().setPos2(player, loc);
-        MessageUtil.send(player, "pos2-set", Map.of(
-                "x", String.valueOf(loc.getBlockX()),
-                "y", String.valueOf(loc.getBlockY()),
-                "z", String.valueOf(loc.getBlockZ())
-        ));
+        MessageUtil.send(player, "pos2-set", coords(loc));
     }
 
     private void handleCreate(Player player, String[] args) {
@@ -98,26 +83,51 @@ public class ParkourCommand implements CommandExecutor, TabCompleter {
 
         plugin.getRegionManager().createRegion(player, regionName);
         MessageUtil.send(player, "region-created", Map.of("region", regionName));
+
+        // Clear selection after creation
+        plugin.getSelectionManager().clearSelection(player);
     }
 
     private void handleSetStart(Player player, String[] args) {
-        plugin.getRegionManager().setStart(player, player.getLocation());
+        Region region = getRegionForCommand(player, args);
+        if (region == null) return;
+
+        region.setStart(player.getLocation());
         MessageUtil.send(player, "start-set");
     }
 
     private void handleSetFinish(Player player, String[] args) {
-        plugin.getRegionManager().setFinish(player, player.getLocation());
+        Region region = getRegionForCommand(player, args);
+        if (region == null) return;
+
+        region.setFinish(player.getLocation());
         MessageUtil.send(player, "finish-set");
     }
 
     private void handleAddCheckpoint(Player player, String[] args) {
-        if (args.length < 2) {
+        if (args.length < 3) {
             MessageUtil.send(player, "checkpoint-usage");
             return;
         }
-        int number = Integer.parseInt(args[1]);
-        plugin.getRegionManager().addCheckpoint(player, number, player.getLocation());
+        String regionName = args[1];
+        int number = parseInt(args[2], player);
+        if (number == -1) return;
+
+        plugin.getRegionManager().addCheckpoint(regionName, number, player.getLocation());
         MessageUtil.send(player, "checkpoint-added", Map.of("num", String.valueOf(number)));
+    }
+
+    private void handleEditCheckpoint(Player player, String[] args) {
+        if (args.length < 3) {
+            MessageUtil.send(player, "editcheckpoint-usage");
+            return;
+        }
+        String regionName = args[1];
+        int number = parseInt(args[2], player);
+        if (number == -1) return;
+
+        plugin.getRegionManager().editCheckpoint(regionName, number, player.getLocation());
+        MessageUtil.send(player, "checkpoint-edited", Map.of("num", String.valueOf(number)));
     }
 
     private void handleRegion(Player player, String[] args) {
@@ -134,84 +144,18 @@ public class ParkourCommand implements CommandExecutor, TabCompleter {
                     MessageUtil.send(player, "checkpoint-remove-usage");
                     return;
                 }
-                int num = Integer.parseInt(args[3]);
+                int num = parseInt(args[3], player);
+                if (num == -1) return;
+
                 plugin.getRegionManager().removeCheckpoint(regionName, num);
                 MessageUtil.send(player, "checkpoint-removed", Map.of("num", String.valueOf(num)));
             }
-            case "addfinishcommand" -> {
-                if (args.length < 4) {
-                    MessageUtil.send(player, "addfinishcommand-usage");
-                    return;
-                }
-                String cmd = String.join(" ", Arrays.copyOfRange(args, 3, args.length));
-                plugin.getRegionManager().addFinishCommand(regionName, cmd);
-                MessageUtil.send(player, "finishcommand-added", Map.of("cmd", cmd));
-            }
-            case "removefinishcommand" -> {
-                if (args.length < 4) {
-                    MessageUtil.send(player, "removefinishcommand-usage");
-                    return;
-                }
-                int index = Integer.parseInt(args[3]);
-                plugin.getRegionManager().removeFinishCommand(regionName, index);
-                MessageUtil.send(player, "finishcommand-removed", Map.of("index", String.valueOf(index)));
-            }
-            case "setfinishcommand" -> {
-                if (args.length < 5) {
-                    MessageUtil.send(player, "setfinishcommand-usage");
-                    return;
-                }
-                int index = Integer.parseInt(args[3]);
-                String cmd = String.join(" ", Arrays.copyOfRange(args, 4, args.length));
-                plugin.getRegionManager().setFinishCommand(regionName, index, cmd);
-                MessageUtil.send(player, "finishcommand-set", Map.of("index", String.valueOf(index), "cmd", cmd));
-            }
-            case "setfally" -> {
-                if (args.length < 4) {
-                    MessageUtil.send(player, "setfally-usage");
-                    return;
-                }
-                int y = Integer.parseInt(args[3]);
-                plugin.getRegionManager().setFallY(regionName, y);
-                MessageUtil.send(player, "fally-set", Map.of("y", String.valueOf(y)));
-            }
-            case "cooldown" -> {
-                if (args.length < 4) {
-                    MessageUtil.send(player, "cooldown-usage");
-                    return;
-                }
-                String time = args[3];
-                plugin.getRegionManager().setCooldown(regionName, time);
-                MessageUtil.send(player, "cooldown-set", Map.of("time", time));
-            }
-            case "addblacklist" -> {
-                if (args.length < 4) {
-                    MessageUtil.send(player, "addblacklist-usage");
-                    return;
-                }
-                Material mat = Material.matchMaterial(args[3]);
-                if (mat == null) {
-                    MessageUtil.send(player, "invalid-block", Map.of("block", args[3]));
-                    return;
-                }
-                plugin.getRegionManager().addBlacklist(regionName, mat);
-                MessageUtil.send(player, "blacklist-added", Map.of("block", mat.name()));
-            }
-            case "removeblacklist" -> {
-                if (args.length < 4) {
-                    MessageUtil.send(player, "removeblacklist-usage");
-                    return;
-                }
-                Material mat = Material.matchMaterial(args[3]);
-                if (mat == null) {
-                    MessageUtil.send(player, "invalid-block", Map.of("block", args[3]));
-                    return;
-                }
-                plugin.getRegionManager().removeBlacklist(regionName, mat);
-                MessageUtil.send(player, "blacklist-removed", Map.of("block", mat.name()));
-            }
             case "tp" -> {
                 Location middle = plugin.getRegionManager().getRegionMiddle(regionName);
+                if (middle == null) {
+                    MessageUtil.send(player, "no-region-info");
+                    return;
+                }
                 player.teleport(middle);
                 MessageUtil.send(player, "region-tp", Map.of("region", regionName));
             }
@@ -219,18 +163,12 @@ public class ParkourCommand implements CommandExecutor, TabCompleter {
         }
     }
 
-    private void handleEditCheckpoint(Player player, String[] args) {
-        if (args.length < 2) {
-            MessageUtil.send(player, "editcheckpoint-usage");
-            return;
-        }
-        int num = Integer.parseInt(args[1]);
-        plugin.getRegionManager().editCheckpoint(player, num, player.getLocation());
-        MessageUtil.send(player, "checkpoint-edited", Map.of("num", String.valueOf(num)));
-    }
-
     private void handleList(Player player) {
         List<String> regions = plugin.getRegionManager().listRegions();
+        if (regions.isEmpty()) {
+            MessageUtil.send(player, "no-regions");
+            return;
+        }
         MessageUtil.send(player, "region-list", Map.of("list", String.join(", ", regions)));
     }
 
@@ -260,12 +198,43 @@ public class ParkourCommand implements CommandExecutor, TabCompleter {
         MessageUtil.send(player, "region-deleted", Map.of("region", regionName));
     }
 
+    // -------- Helpers --------
+
+    private Region getRegionForCommand(Player player, String[] args) {
+        if (args.length < 2) {
+            MessageUtil.send(player, "region-needed");
+            return null;
+        }
+        Region region = plugin.getRegionManager().getRegion(args[1]);
+        if (region == null) {
+            MessageUtil.send(player, "region-not-found", Map.of("region", args[1]));
+        }
+        return region;
+    }
+
+    private int parseInt(String input, Player player) {
+        try {
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            MessageUtil.send(player, "invalid-number", Map.of("input", input));
+            return -1;
+        }
+    }
+
+    private Map<String, String> coords(Location loc) {
+        return Map.of(
+                "x", String.valueOf(loc.getBlockX()),
+                "y", String.valueOf(loc.getBlockY()),
+                "z", String.valueOf(loc.getBlockZ())
+        );
+    }
+
     // -------- TAB COMPLETION --------
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("pos1", "pos2", "create", "setstart", "setfinish", "addcheckpoint",
-                    "region", "editcheckpoint", "list", "info", "delete");
+            return Arrays.asList("pos1", "pos2", "create", "setstart", "setfinish",
+                    "addcheckpoint", "editcheckpoint", "region", "list", "info", "delete");
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("create")) {
             return Collections.singletonList("<region>");
@@ -275,8 +244,7 @@ public class ParkourCommand implements CommandExecutor, TabCompleter {
                 return plugin.getRegionManager().listRegions();
             }
             if (args.length == 3) {
-                return Arrays.asList("removecheckpoint", "addfinishcommand", "removefinishcommand",
-                        "setfinishcommand", "setfally", "cooldown", "addblacklist", "removeblacklist", "tp");
+                return Arrays.asList("removecheckpoint", "tp");
             }
         }
         return Collections.emptyList();
