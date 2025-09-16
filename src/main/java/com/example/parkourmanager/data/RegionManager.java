@@ -1,170 +1,208 @@
 package com.example.parkourmanager.data;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import com.example.parkourmanager.ParkourManager;
+import com.example.parkourmanager.utils.MessageUtil;
+import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public class RegionManager {
 
+    private final ParkourManager plugin;
     private final Map<String, Region> regions = new HashMap<>();
-    private final File file;
-    private final FileConfiguration config;
 
-    public RegionManager(File dataFolder) {
-        this.file = new File(dataFolder, "regions.yml");
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        this.config = YamlConfiguration.loadConfiguration(file);
+    public RegionManager(ParkourManager plugin) {
+        this.plugin = plugin;
         loadRegions();
     }
 
-    // ----- CRUD Operations -----
+    // ========== REGION CREATION ==========
+    public void createRegion(Player player, String name) {
+        if (regions.containsKey(name)) {
+            MessageUtil.send(player, "region-exists", Map.of("region", name));
+            return;
+        }
 
-    public boolean createRegion(String name, Location pos1, Location pos2) {
-        if (regions.containsKey(name.toLowerCase())) return false;
+        Location pos1 = plugin.getSelectionManager().getPos1(player);
+        Location pos2 = plugin.getSelectionManager().getPos2(player);
+        if (pos1 == null || pos2 == null) {
+            MessageUtil.send(player, "need-selection");
+            return;
+        }
+
         Region region = new Region(name, pos1, pos2);
-        regions.put(name.toLowerCase(), region);
+        regions.put(name, region);
         saveRegions();
-        return true;
     }
 
-    public boolean deleteRegion(String name) {
-        if (!regions.containsKey(name.toLowerCase())) return false;
-        regions.remove(name.toLowerCase());
+    public void deleteRegion(String name) {
+        regions.remove(name);
         saveRegions();
-        return true;
     }
 
+    // ========== GETTERS ==========
     public Region getRegion(String name) {
-        return regions.get(name.toLowerCase());
+        return regions.get(name);
     }
 
-    public Collection<Region> getAllRegions() {
-        return regions.values();
+    public List<String> listRegions() {
+        return new ArrayList<>(regions.keySet());
     }
 
-    // ----- Save / Load -----
+    public Region getRegionAt(Location loc) {
+        for (Region r : regions.values()) {
+            if (r.isInside(loc)) {
+                return r;
+            }
+        }
+        return null;
+    }
 
+    public Location getRegionMiddle(String name) {
+        Region r = getRegion(name);
+        if (r == null) return null;
+        return r.getMiddle();
+    }
+
+    public String getRegionInfo(String name) {
+        Region r = getRegion(name);
+        if (r == null) return "Unknown region.";
+        return r.toInfoString();
+    }
+
+    // ========== REGION SETTINGS ==========
+    public void setStart(Player player, Location loc) {
+        Region region = getRegionAt(loc);
+        if (region == null) {
+            MessageUtil.send(player, "no-region-info");
+            return;
+        }
+        region.setStart(loc);
+        saveRegions();
+    }
+
+    public void setFinish(Player player, Location loc) {
+        Region region = getRegionAt(loc);
+        if (region == null) {
+            MessageUtil.send(player, "no-region-info");
+            return;
+        }
+        region.setFinish(loc);
+        saveRegions();
+    }
+
+    public void addCheckpoint(String regionName, int number, Location loc) {
+        Region r = getRegion(regionName);
+        if (r == null) return;
+        r.addCheckpoint(number, loc);
+        saveRegions();
+    }
+
+    public void editCheckpoint(String regionName, int number, Location loc) {
+        Region r = getRegion(regionName);
+        if (r == null) return;
+        r.editCheckpoint(number, loc);
+        saveRegions();
+    }
+
+    public void removeCheckpoint(String regionName, int number) {
+        Region r = getRegion(regionName);
+        if (r == null) return;
+        r.removeCheckpoint(number);
+        saveRegions();
+    }
+
+    public void addFinishCommand(String regionName, String cmd) {
+        Region r = getRegion(regionName);
+        if (r == null) return;
+        r.addFinishCommand(cmd);
+        saveRegions();
+    }
+
+    public void removeFinishCommand(String regionName, int index) {
+        Region r = getRegion(regionName);
+        if (r == null) return;
+        r.removeFinishCommand(index);
+        saveRegions();
+    }
+
+    public void setFinishCommand(String regionName, int index, String cmd) {
+        Region r = getRegion(regionName);
+        if (r == null) return;
+        r.setFinishCommand(index, cmd);
+        saveRegions();
+    }
+
+    public void setFallY(String regionName, int y) {
+        Region r = getRegion(regionName);
+        if (r == null) return;
+        r.setFallY(y);
+        saveRegions();
+    }
+
+    public void setCooldown(String regionName, String time) {
+        Region r = getRegion(regionName);
+        if (r == null) return;
+        r.setCooldown(time);
+        saveRegions();
+    }
+
+    public void addBlacklist(String regionName, Material mat) {
+        Region r = getRegion(regionName);
+        if (r == null) return;
+        r.addBlacklist(mat);
+        saveRegions();
+    }
+
+    public void removeBlacklist(String regionName, Material mat) {
+        Region r = getRegion(regionName);
+        if (r == null) return;
+        r.removeBlacklist(mat);
+        saveRegions();
+    }
+
+    // ========== OUTLINE ==========
+    public void showRegionOutline(String name, Player player, Particle particle) {
+        Region r = getRegion(name);
+        if (r == null) return;
+
+        Bukkit.getScheduler().runTaskTimer(plugin, task -> {
+            if (!player.isOnline()) {
+                task.cancel();
+                return;
+            }
+            r.spawnOutline(particle, player);
+        }, 0L, 20L); // Show outline every second
+    }
+
+    // ========== SAVE/LOAD ==========
     public void saveRegions() {
-        config.getKeys(false).forEach(key -> config.set(key, null)); // clear old data
+        FileConfiguration config = plugin.getConfig();
+        config.set("regions", null); // clear old data
 
         for (Region r : regions.values()) {
-            String path = r.getName();
-
-            config.set(path + ".world", r.getWorldName());
-            config.set(path + ".pos1", serializeLoc(r.getPos1()));
-            config.set(path + ".pos2", serializeLoc(r.getPos2()));
-            config.set(path + ".start", serializeLoc(r.getStart()));
-            config.set(path + ".finish", serializeLoc(r.getFinish()));
-
-            // Checkpoints
-            Map<String, Object> cps = new HashMap<>();
-            for (Map.Entry<Integer, Location> entry : r.getCheckpoints().entrySet()) {
-                cps.put(entry.getKey().toString(), serializeLoc(entry.getValue()));
-            }
-            config.createSection(path + ".checkpoints", cps);
-
-            // Finish Commands
-            config.set(path + ".finishCommands", new ArrayList<>(r.getFinishCommands()));
-
-            // Blacklist
-            List<String> blacklist = new ArrayList<>();
-            for (Material mat : r.getBlacklist()) {
-                blacklist.add(mat.name());
-            }
-            config.set(path + ".blacklist", blacklist);
-
-            config.set(path + ".fallY", r.getFallY());
-            config.set(path + ".cooldown", r.getCooldown());
+            String path = "regions." + r.getName();
+            r.saveToConfig(config.createSection(path));
         }
 
-        try {
-            config.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        plugin.saveConfig();
     }
 
     public void loadRegions() {
         regions.clear();
+        FileConfiguration config = plugin.getConfig();
+        ConfigurationSection section = config.getConfigurationSection("regions");
+        if (section == null) return;
 
-        for (String name : config.getKeys(false)) {
-            String world = config.getString(name + ".world");
-            Location pos1 = deserializeLoc(config.getString(name + ".pos1"));
-            Location pos2 = deserializeLoc(config.getString(name + ".pos2"));
-
-            if (world == null || pos1 == null || pos2 == null) continue;
-
-            Region r = new Region(name, pos1, pos2);
-
-            r.setStart(deserializeLoc(config.getString(name + ".start")));
-            r.setFinish(deserializeLoc(config.getString(name + ".finish")));
-
-            // Checkpoints
-            if (config.isConfigurationSection(name + ".checkpoints")) {
-                for (String key : config.getConfigurationSection(name + ".checkpoints").getKeys(false)) {
-                    int number = Integer.parseInt(key);
-                    Location cpLoc = deserializeLoc(config.getString(name + ".checkpoints." + key));
-                    if (cpLoc != null) {
-                        r.addCheckpoint(number, cpLoc);
-                    }
-                }
+        for (String key : section.getKeys(false)) {
+            ConfigurationSection rs = section.getConfigurationSection(key);
+            if (rs != null) {
+                Region r = Region.loadFromConfig(key, rs);
+                regions.put(key, r);
             }
-
-            // Finish Commands
-            if (config.isList(name + ".finishCommands")) {
-                r.getFinishCommands().addAll(config.getStringList(name + ".finishCommands"));
-            }
-
-            // Blacklist
-            if (config.isList(name + ".blacklist")) {
-                for (String matName : config.getStringList(name + ".blacklist")) {
-                    try {
-                        r.addBlacklist(Material.valueOf(matName));
-                    } catch (IllegalArgumentException ignored) {}
-                }
-            }
-
-            r.setFallY(config.getInt(name + ".fallY", Integer.MIN_VALUE));
-            r.setCooldown(config.getString(name + ".cooldown", "0s"));
-
-            regions.put(name.toLowerCase(), r);
-        }
-    }
-
-    // ----- Utilities -----
-
-    private String serializeLoc(Location loc) {
-        if (loc == null) return null;
-        return loc.getWorld().getName() + "," + loc.getX() + "," + loc.getY() + "," + loc.getZ()
-                + "," + loc.getYaw() + "," + loc.getPitch();
-    }
-
-    private Location deserializeLoc(String s) {
-        if (s == null) return null;
-        try {
-            String[] split = s.split(",");
-            return new Location(
-                    Bukkit.getWorld(split[0]),
-                    Double.parseDouble(split[1]),
-                    Double.parseDouble(split[2]),
-                    Double.parseDouble(split[3]),
-                    Float.parseFloat(split[4]),
-                    Float.parseFloat(split[5])
-            );
-        } catch (Exception e) {
-            return null;
         }
     }
 }
